@@ -1,0 +1,48 @@
+name: Boilerplate Production CI Pipeline
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  verify-and-build:
+    name: Framework Hardening Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout codebase from version control repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js runtime environment with automatic caching
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # 3. Install completely clean project dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # 4. Phase 28 Assertion: Verify formatting matches Prettier expectations
+      - name: Run Code Style Check (Prettier)
+        run: npx prettier --check "src/**/*.{ts,tsx,css}"
+
+      # 5. Phase 28 Assertion: Code structure and TanStack analysis
+      - name: Run Code Linter Check (ESLint)
+        run: npm run lint
+
+      # 6. Strict Typecheck Assertion: Catch type mutations or breaks
+      - name: Run Strict TypeScript Verification
+        run: npx tsc --noEmit
+
+      # 7. Production Compilation Build Assertion
+      - name: Execute Production Next.js Build Compiler
+        run: npm run build
+        env:
+          # Mock environment vars so compilation parses safely through env.ts validator
+          NEXT_PUBLIC_API_URL: https://mock-production-target.com
+          NEXT_PUBLIC_APP_ENV: production
