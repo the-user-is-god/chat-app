@@ -18,17 +18,32 @@ enum Role {
   MODERATOR
 }
 
+enum ChannelVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum ChannelRole {
+  OWNER
+  ADMIN
+  MODERATOR
+  MEMBER
+  VIEWER
+}
+
+// auth tables
 model User {
   id    String     @id @default(uuid())
   email String  @unique
   password String
   name  String?
+  avatar String?
   role Role @default(USER)
 
   isVerified Boolean @default(false)
   isBanned Boolean @default(false)
 
-  refreshToken String?
+  // refreshToken String?
 
   passwordResetToken String?
   passwordResetExpires DateTime?
@@ -37,6 +52,11 @@ model User {
   emailVerificationExpires DateTime?
   
   sessions Session[]
+  // chat app relations
+  channels Channel[]  @relation("CreatedChannels")
+  channelMembers ChannelMember[]
+  messages Message[]
+  invitations Invitation[] @relation("CreatedInvitations")
 }
 
 model Session {
@@ -54,4 +74,77 @@ model Session {
 
   expires DateTime
   createdAt DateTime @default(now())
+}
+
+// chat application tables
+model Channel {
+  id String @id @default(uuid())
+  name String
+  description String?
+  avatar String?
+  visibility ChannelVisibility
+
+  createdById String
+  createdBy User @relation("CreatedChannels",fields: [createdById], references: [id])
+
+  createdAt DateTime
+  updatedAt DateTime
+
+  channelMembers ChannelMember[]
+  messages Message[]
+  invitations Invitation[]
+}
+
+model ChannelMember {
+  id String @id @default(uuid())
+  channelId String
+  userId String
+  
+  role ChannelRole @default(VIEWER)
+
+  joinedAt DateTime
+  lastReadMessageId String?
+
+  channel Channel @relation(fields: [channelId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([channelId,userId])
+}
+
+model Invitation {
+  id          String   @id @default(uuid())
+  code        String   @unique @default(uuid()) // Short code or UUID used in QR/Links
+  channelId   String
+  createdById String
+
+  maxUses     Int?     // Null = unlimited
+  uses        Int      @default(0)
+  expiresAt   DateTime?
+  isRevoked   Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdBy User    @relation("CreatedInvitations", fields: [createdById], references: [id])
+}
+
+model Message {
+  id String @id @default(uuid())
+  channelId String
+  senderId String
+
+  content String
+
+  clientMessageId String? // for idempotency
+  parentMessageId String?  // For replies / threading
+  isEdited        Boolean  @default(false)
+
+  createdAt DateTime
+  updatedAt DateTime
+  deletedAt DateTime?
+
+  channel Channel @relation(fields: [channelId],references: [id],onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id])
+  parent  Message? @relation("MessageReplies", fields: [parentMessageId], references: [id], onDelete: SetNull)
+  replies Message[] @relation("MessageReplies")
 }
