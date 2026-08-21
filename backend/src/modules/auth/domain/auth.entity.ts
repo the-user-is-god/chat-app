@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string;
   email: string;
   name: string | null;
+  avatar?: string;
   password: string;
   role: "USER" | "ADMIN" | "MODERATOR";
   isBanned: boolean;
