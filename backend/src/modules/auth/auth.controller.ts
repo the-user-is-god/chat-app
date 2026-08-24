@@ -22,7 +22,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   return ApiResponse.success(
     res,
     { user: responseData },
-    "Check you email for verification",
+    "Check your email for verification",
     HTTP_STATUS.CREATED,
   );
 });

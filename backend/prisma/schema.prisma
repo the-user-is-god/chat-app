@@ -88,7 +88,7 @@ model Channel {
   createdBy User @relation("CreatedChannels",fields: [createdById], references: [id])
 
   createdAt DateTime
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 
   channelMembers ChannelMember[]
   messages Message[]
@@ -102,7 +102,7 @@ model ChannelMember {
   
   role ChannelRole @default(VIEWER)
 
-  joinedAt DateTime
+  joinedAt DateTime @default(now())
   lastReadMessageId String?
 
   channel Channel @relation(fields: [channelId],references: [id],onDelete: Cascade)

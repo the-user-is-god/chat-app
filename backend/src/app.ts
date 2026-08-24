@@ -8,6 +8,7 @@ import { globalErrorHandler } from "@common/middleware/error.middleware.js";
 import { userRoutes } from "@modules/users/user.routes.js";
 import { applySecurityMiddlewares } from "@common/middleware/security.middleware.js";
 import { healthRoutes } from "@modules/health/health.route.js";
+import { channelRoutes } from "@modules/channels/channel.routes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use(morganMiddleware);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/health", healthRoutes);
+app.use("/api/v1/channels", channelRoutes);
 
 // Keep Render's root balancers happy and log-free
 app.get("/", (req, res) => {

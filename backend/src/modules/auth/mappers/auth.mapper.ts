@@ -12,7 +12,7 @@ export class AuthMapper {
       emailVerificationExpires: user.emailVerificationExpires,
       passwordResetToken: user.passwordResetToken,
       passwordResetExpires: user.passwordResetExpires,
-      refreshToken: user.refreshToken,
+      // refreshToken: user.refreshToken,
     };
   }
   static toResponse(user: AuthUser): AuthResponseDTO {
