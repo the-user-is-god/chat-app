@@ -32,4 +32,7 @@ export class ChannelMapper {
       updatedAt: channel.updatedAt,
     };
   }
+  static toManyResponse(channels: ChannelEntity[]): ChannelResponseDTO[] {
+    return channels.map((channel) => this.toResponse(channel));
+  }
 }
