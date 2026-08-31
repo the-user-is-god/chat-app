@@ -13,4 +13,23 @@ export class MemberRepository extends BaseRepository<
   constructor() {
     super(prisma.channelMember, MemberMapper.toDomainEntity);
   }
+
+  async findByChannelAndUser(channelId: string, userId: string): Promise<MemberEntity | null> {
+    const member = await prisma.channelMember.findUnique({
+      where: { channelId_userId: { channelId, userId } },
+    });
+    return member ? MemberMapper.toDomainEntity(member) : null;
+  }
+
+  async findByChannelId(channelId: string): Promise<MemberEntity[]> {
+    const members = await prisma.channelMember.findMany({
+      where: { channelId },
+      include: { user: true },
+    });
+    return MemberMapper.toDomainEntities(members);
+  }
+
+  async deleteByChannelAndUser(channelId: string, userId: string): Promise<void> {
+    await prisma.channelMember.delete({ where: { channelId_userId: { channelId, userId } } });
+  }
 }
