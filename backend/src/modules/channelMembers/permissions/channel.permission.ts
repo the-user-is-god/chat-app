@@ -1,7 +1,7 @@
 import { ChannelRole } from "@generated/prisma/enums.js";
 
 export class ChannelPermissions {
-  static canManageChannelSettings(role: ChannelRole): boolean {
+  static canManageChannel(role: ChannelRole): boolean {
     return role === "OWNER";
   }
 
