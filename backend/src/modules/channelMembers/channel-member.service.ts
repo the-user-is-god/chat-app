@@ -2,6 +2,7 @@ import { Errors } from "@common/utils/errors.js";
 import { MemberEntity } from "./domain/channel-member.entity.js";
 import { MemberRepository } from "./repositories/channel-member.repository.js";
 import { ChannelRepository } from "@modules/channels/repositories/channel.repository.js";
+import { ChannelPermissions } from "./permissions/channel.permission.js";
 
 export class MemberService {
   constructor(
@@ -60,7 +61,7 @@ export class MemberService {
       throw Errors.notFound("User is not a member of this channel");
     }
 
-    if (member.role === "OWNER") {
+    if (ChannelPermissions.canLeaveChannel(member.role)) {
       throw Errors.badRequest(
         "Channel Owner cannot leave the channel without transferring the ownership",
       );
