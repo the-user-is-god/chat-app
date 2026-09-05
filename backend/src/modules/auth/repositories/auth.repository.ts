@@ -20,13 +20,13 @@ export class AuthRepository extends BaseRepository<
     return user ? AuthMapper.toAuthDomainEntity(user) : null;
   }
 
-  async updateRefreshToken(userId: string, hashedRefreshToken: string | null): Promise<AuthUser> {
-    const user = await prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: hashedRefreshToken },
-    });
-    return AuthMapper.toAuthDomainEntity(user);
-  }
+  // async updateRefreshToken(userId: string, hashedRefreshToken: string | null): Promise<AuthUser> {
+  //   const user = await prisma.user.update({
+  //     where: { id: userId },
+  //     data: { refreshToken: hashedRefreshToken },
+  //   });
+  //   return AuthMapper.toAuthDomainEntity(user);
+  // }
 
   async findByVerificationToken(hashedToken: string): Promise<AuthUser | null> {
     const user = await prisma.user.findFirst({
@@ -93,7 +93,6 @@ export class AuthRepository extends BaseRepository<
         password: hashPassword,
         passwordResetToken: null,
         passwordResetExpires: null,
-        refreshToken: null, // Clear active sessions on password change
       },
     });
     return AuthMapper.toAuthDomainEntity(user);
