@@ -61,7 +61,7 @@ export class MemberService {
       throw Errors.notFound("User is not a member of this channel");
     }
 
-    if (ChannelPermissions.canLeaveChannel(member.role)) {
+    if (!ChannelPermissions.canLeaveChannel(member.role)) {
       throw Errors.badRequest(
         "Channel Owner cannot leave the channel without transferring the ownership",
       );
