@@ -139,8 +139,8 @@ model Message {
   parentMessageId String?  // For replies / threading
   isEdited        Boolean  @default(false)
 
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   deletedAt DateTime?
 
   channel Channel @relation(fields: [channelId],references: [id],onDelete: Cascade)

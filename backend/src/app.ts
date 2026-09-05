@@ -11,6 +11,7 @@ import { healthRoutes } from "@modules/health/health.route.js";
 import { channelRoutes } from "@modules/channels/channel.routes.js";
 import { memberRoutes } from "@modules/channelMembers/channel-member.routes.js";
 import { invitationRoutes } from "@modules/invitations/invitation.routes.js";
+import { messageRoutes } from "@modules/messages/message.routes.js";
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/channels", channelRoutes);
 app.use("/api/v1/members", memberRoutes);
 app.use("/api/v1/invitations", invitationRoutes);
+app.use("/api/v1/messages", messageRoutes);
 
 // Keep Render's root balancers happy and log-free
 app.get("/", (req, res) => {
