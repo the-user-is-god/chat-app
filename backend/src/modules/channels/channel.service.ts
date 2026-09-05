@@ -50,6 +50,9 @@ export class ChannelService {
     if (!channel) {
       throw Errors.notFound("Channel not Found");
     }
+    if (channel.visibility === "PRIVATE") {
+      throw Errors.notFound("Channel is Private");
+    }
 
     return channel;
   }
