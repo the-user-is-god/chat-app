@@ -147,4 +147,6 @@ model Message {
   sender User @relation(fields: [senderId], references: [id])
   parent  Message? @relation("MessageReplies", fields: [parentMessageId], references: [id], onDelete: SetNull)
   replies Message[] @relation("MessageReplies")
+
+  @@unique([channelId,clientMessageId])
 }

@@ -35,13 +35,29 @@ export class MessageService {
         return existing;
       }
     }
+    // Validate that the parent message exists and belongs to the SAME channel
+    if (dto.parentMessageId) {
+      const parentMessage = await this.messageRepository.findById(dto.parentMessageId);
+
+      if (!parentMessage) {
+        throw Errors.notFound("The message you are replying to does not exist.");
+      }
+
+      if (parentMessage.channelId !== channelId) {
+        throw Errors.badRequest("Cannot reply to a message from a different channel.");
+      }
+    }
+
+    const parentRelation = dto.parentMessageId
+      ? { connect: { id: dto.parentMessageId } }
+      : undefined;
 
     return this.messageRepository.create({
       channel: { connect: { id: channelId } },
       sender: { connect: { id: userId } },
       content: dto.content,
       clientMessageId: dto.clientMessageId ?? null,
-      parent: dto.parentMessageId ? { connect: { id: dto.parentMessageId } } : undefined,
+      parent: parentRelation,
     });
   }
 
