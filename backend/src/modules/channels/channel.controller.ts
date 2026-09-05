@@ -36,3 +36,14 @@ export const getChannelById = asyncHandler(async (req: Request, res: Response) =
 
   return ApiResponse.success(res, { channel: responseData }, "Success");
 });
+
+export const getJoinedChannels = asyncHandler(async (req: Request, res: Response) => {
+  const channels = await channelService.getMyChannels(req.user.id);
+  const responseData = ChannelMapper.toManyResponse(channels);
+
+  return ApiResponse.success(
+    res,
+    { channels: responseData },
+    "Successfully fetched your channels.",
+  );
+});

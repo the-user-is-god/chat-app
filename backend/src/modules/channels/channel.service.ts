@@ -56,4 +56,9 @@ export class ChannelService {
 
     return channel;
   }
+
+  async getMyChannels(userId: string): Promise<ChannelEntity[]> {
+    const channels = await this.channelRepository.findJoinedChannels(userId);
+    return channels ?? [];
+  }
 }

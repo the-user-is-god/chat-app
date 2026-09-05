@@ -18,4 +18,12 @@ export class ChannelRepository extends BaseRepository<
     const channels = await prisma.channel.findMany({ where: { visibility: "PUBLIC" } });
     return channels ? ChannelMapper.toDomainEntities(channels) : null;
   }
+
+  async findJoinedChannels(userId: string): Promise<ChannelEntity[] | null> {
+    const channels = await prisma.channel.findMany({
+      where: { channelMembers: { some: { userId: userId } } },
+    });
+
+    return channels ? ChannelMapper.toDomainEntities(channels) : null;
+  }
 }
