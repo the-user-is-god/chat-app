@@ -25,3 +25,7 @@ export const getMessagesQuerySchema = z.object({
         .max(100, "Cannot fetch more than 100 messages at once"),
     ),
 });
+
+export const channelParamsSchema = z.object({
+  channelId: z.uuid(),
+});
