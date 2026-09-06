@@ -11,7 +11,7 @@ import { protect } from "@common/middleware/auth.middleware.js";
 
 export const channelRoutes = express.Router();
 
-channelRoutes.post("/", protect, validate(createChannelSchema), createChannel);
+channelRoutes.post("/", protect, validate("body", createChannelSchema), createChannel);
 channelRoutes.get("/me", protect, getJoinedChannels);
 // public apis
 channelRoutes.get("/", getPublicChannels);

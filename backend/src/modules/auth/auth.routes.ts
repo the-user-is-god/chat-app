@@ -22,8 +22,8 @@ import { protect } from "@common/middleware/auth.middleware.js";
 
 export const authRoutes = express.Router();
 
-authRoutes.post("/register", validate(registerSchema), register);
-authRoutes.post("/login", validate(loginSchema), login);
+authRoutes.post("/register", validate("body", registerSchema), register);
+authRoutes.post("/login", validate("body", loginSchema), login);
 
 authRoutes.get("/refresh", refresh);
 
@@ -31,16 +31,20 @@ authRoutes.get("/refresh", refresh);
 authRoutes.get("/verify-email", verifyEmail);
 authRoutes.post(
   "/resend-verification",
-  validate(resendEmailVerificationSchema),
+  validate("body", resendEmailVerificationSchema),
   resendVerificationEmailController,
 );
 
 // Password Management
-authRoutes.post("/forgot-password", validate(forgotPasswordSchema), forgotPasswordController);
+authRoutes.post(
+  "/forgot-password",
+  validate("body", forgotPasswordSchema),
+  forgotPasswordController,
+);
 authRoutes.post(
   "/reset-password",
   //   authRateLimiter,
-  validate(resetPasswordSchema),
+  validate("body", resetPasswordSchema),
   resetPasswordController,
 );
 
