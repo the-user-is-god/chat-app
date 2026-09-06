@@ -6,3 +6,7 @@ export const createChannelSchema = z.object({
   avatar: z.url().optional(),
   visibility: z.enum(["PUBLIC", "PRIVATE"]).default("PRIVATE"),
 });
+
+export const channelParamsSchema = z.object({
+  channelId: z.uuid("Invalid channel id format"),
+});

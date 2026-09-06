@@ -14,10 +14,6 @@ export const joinWithInviteSchema = z.object({
   code: z.uuid("Invalid invitation code format"),
 });
 
-export const channelParamsSchema = z.object({
-  channelId: z.uuid("Invalid channel id format"),
-});
-
 export const inviteParamsSchema = z.object({
   inviteId: z.uuid("Invalid invite id format"),
 });

@@ -1,6 +1,6 @@
 import { validate } from "@common/middleware/validation.middleware.js";
 import express from "express";
-import { createChannelSchema } from "./channel.validation.js";
+import { channelParamsSchema, createChannelSchema } from "./channel.validation.js";
 import {
   createChannel,
   getChannelById,
@@ -15,4 +15,4 @@ channelRoutes.post("/", protect, validate("body", createChannelSchema), createCh
 channelRoutes.get("/me", protect, getJoinedChannels);
 // public apis
 channelRoutes.get("/", getPublicChannels);
-channelRoutes.get("/:id", getChannelById);
+channelRoutes.get("/:channelId", validate("params", channelParamsSchema), getChannelById);

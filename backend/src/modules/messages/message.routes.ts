@@ -2,11 +2,8 @@ import { protect } from "@common/middleware/auth.middleware.js";
 import { Router } from "express";
 import { deleteMessage, getMessages, sendMessage } from "./message.controller.js";
 import { validate } from "@common/middleware/validation.middleware.js";
-import {
-  channelParamsSchema,
-  getMessagesQuerySchema,
-  sendMessageSchema,
-} from "./message.validation.js";
+import { getMessagesQuerySchema, sendMessageSchema } from "./message.validation.js";
+import { channelParamsSchema } from "@modules/channels/channel.validation.js";
 
 export const messageRoutes = Router();
 

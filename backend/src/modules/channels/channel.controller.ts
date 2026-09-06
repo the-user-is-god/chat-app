@@ -26,11 +26,11 @@ export const getPublicChannels = asyncHandler(async (req: Request, res: Response
 });
 
 export const getChannelById = asyncHandler(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  if (typeof id !== "string") {
+  const { channelId } = req.params;
+  if (typeof channelId !== "string") {
     throw Errors.badRequest("Invalid or missing channel ID");
   }
-  const channel = await channelService.getChannelById(id);
+  const channel = await channelService.getChannelById(channelId);
 
   const responseData = ChannelMapper.toResponse(channel);
 

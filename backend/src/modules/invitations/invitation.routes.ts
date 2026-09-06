@@ -2,12 +2,12 @@ import { Router } from "express";
 import { protect } from "@common/middleware/auth.middleware.js";
 import { createInvite, joinWithInvite, revokeInvite } from "./invitation.controller.js";
 import {
-  channelParamsSchema,
   createInvitationSchema,
   inviteParamsSchema,
   joinWithInviteSchema,
 } from "./invitation.validation.js";
 import { validate } from "@common/middleware/validation.middleware.js";
+import { channelParamsSchema } from "@modules/channels/channel.validation.js";
 
 export const invitationRoutes = Router();
 
