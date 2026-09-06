@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect } from "@common/middleware/auth.middleware.js";
+import { protect, requireVerification } from "@common/middleware/auth.middleware.js";
 import { createInvite, joinWithInvite, revokeInvite } from "./invitation.controller.js";
 import {
   createInvitationSchema,
@@ -11,7 +11,7 @@ import { channelParamsSchema } from "@modules/channels/channel.validation.js";
 
 export const invitationRoutes = Router();
 
-invitationRoutes.use(protect);
+invitationRoutes.use(protect, requireVerification);
 
 // Join channel via invitation code
 invitationRoutes.post("/join", validate("body", joinWithInviteSchema), joinWithInvite);

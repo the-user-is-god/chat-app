@@ -1,4 +1,4 @@
-import { protect } from "@common/middleware/auth.middleware.js";
+import { protect, requireVerification } from "@common/middleware/auth.middleware.js";
 import { Router } from "express";
 import {
   getMyMembership,
@@ -12,7 +12,7 @@ import { channelParamsSchema } from "@modules/channels/channel.validation.js";
 // mergeParams: true allows reading :channelId from parent channel routes
 export const memberRoutes = Router();
 
-memberRoutes.use(protect);
+memberRoutes.use(protect, requireVerification);
 
 memberRoutes.get("/:channelId", validate("params", channelParamsSchema), listMembers);
 memberRoutes.get("/me/:channelId", validate("params", channelParamsSchema), getMyMembership);
