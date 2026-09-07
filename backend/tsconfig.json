@@ -22,7 +22,8 @@
       "@lib/*": ["./src/lib/*"],
       "@modules/*": ["./src/modules/*"],
 
-      "@generated/*": ["./src/generated/*"]
+      "@generated/*": ["./src/generated/*"],
+      "@socket/*": ["./src/socket/*"]
     }
   },
   "include": ["src/**/*"] /* Tells tsc to only compile files in src */,

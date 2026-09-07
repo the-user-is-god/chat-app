@@ -1,12 +1,22 @@
 import { Server } from "http";
 import { prisma } from "@infrastructure/db.js";
 import { logger } from "@lib/logger.js";
+import { getIO } from "@socket/socket.server.js";
 
 export const setupGracefulShutdown = (server: Server): void => {
   const handleShutdown = async (signal: string) => {
     logger.warn(`⚠️ Received ${signal}. Starting graceful shutdown sequence...`);
 
-    // 1. Stop the HTTP server from accepting any new incoming network requests
+    try {
+      const io = getIO();
+      logger.info("🔌 Closing active Socket.io connections...");
+      io.close();
+      logger.info("🟩 All Socket.io client connections terminated cleanly.");
+    } catch {
+      // If server crashes before socket initialized, catch the getIO() throw safely
+      logger.debug("Socket.io was not initialized; skipping socket cleanup.");
+    }
+    //  Stop the HTTP server from accepting any new incoming network requests
     server.close(async (err) => {
       if (err) {
         logger.error({ err }, "Error occurred while closing the HTTP server context.");
