@@ -1,4 +1,4 @@
-import { protect, requireVerification } from "@common/middleware/auth.middleware.js";
+import { protect, requireVerification } from "@common/middleware/auth/auth.middleware.js";
 import express from "express";
 import { updateProfileController } from "./user.controller.js";
 import { validate } from "@common/middleware/validation.middleware.js";

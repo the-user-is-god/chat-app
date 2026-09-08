@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protect, requireVerification } from "@common/middleware/auth.middleware.js";
+import { protect, requireVerification } from "@common/middleware/auth/auth.middleware.js";
 import { createInvite, joinWithInvite, revokeInvite } from "./invitation.controller.js";
 import {
   createInvitationSchema,

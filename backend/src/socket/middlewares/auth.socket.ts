@@ -1,4 +1,4 @@
-import { protect } from "@common/middleware/auth.middleware.js";
+import { protect } from "@common/middleware/auth/auth.middleware.js";
 import { Server } from "socket.io";
 
 export function socketAuthMiddleware(io: Server) {

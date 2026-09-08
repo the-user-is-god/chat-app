@@ -7,7 +7,7 @@ import {
   getJoinedChannels,
   getPublicChannels,
 } from "./channel.controller.js";
-import { protect, requireVerification } from "@common/middleware/auth.middleware.js";
+import { protect, requireVerification } from "@common/middleware/auth/auth.middleware.js";
 
 export const channelRoutes = express.Router();
 

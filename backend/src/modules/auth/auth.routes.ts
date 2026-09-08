@@ -18,7 +18,7 @@ import {
   resendEmailVerificationSchema,
   resetPasswordSchema,
 } from "./auth.validation.js";
-import { protect } from "@common/middleware/auth.middleware.js";
+import { protect } from "@common/middleware/auth/auth.middleware.js";
 
 export const authRoutes = express.Router();
 
