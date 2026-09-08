@@ -10,7 +10,7 @@ export function registerConnectionHandlers(io: Server) {
 
     // handlers
     registerChannelHandlers(socket);
-    registerMessageHandler(socket);
+    registerMessageHandler(socket, io);
     registerTypingHandler(socket);
 
     socket.on("disconnect", () => {
