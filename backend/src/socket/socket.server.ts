@@ -1,7 +1,7 @@
 import { ENV } from "@config/env.js";
-import { logger } from "@lib/logger.js";
 import type { Server as HttpServer } from "node:http";
 import { Server } from "socket.io";
+import { registerConnectionHandlers } from "./socket.register.js";
 
 let io: Server;
 
@@ -12,15 +12,7 @@ export function initializeSocket(httpServer: HttpServer) {
       credentials: true,
     },
   });
-
-  io.on("connection", (socket) => {
-    logger.info(`Client Connected: ${socket.id}`);
-
-    socket.on("disconnect", () => {
-      logger.info(`Client Disconnected: ${socket.id}`);
-    });
-  });
-
+  registerConnectionHandlers(io);
   return io;
 }
 
