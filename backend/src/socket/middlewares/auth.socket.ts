@@ -1,17 +1,23 @@
-import { protect } from "@common/middleware/auth/auth.middleware.js";
+import { authenticateUser } from "@common/middleware/auth/auth.service.js";
+import { SocketRequest } from "@socket/types/socket.types.js";
 import { Server } from "socket.io";
 
 export function socketAuthMiddleware(io: Server) {
-  return io.use((socket, next) => {
-    protect(socket.request as any, {} as any, (err?: any) => {
-      if (err) {
-        // If protect returns an AppError, cleanly pass it to Socket.IO
-        return next(new Error(err.message || "Authentication failed"));
+  io.use(async (socket, next) => {
+    try {
+      const request = socket.request as SocketRequest;
+      const token = request.cookies?.accessToken;
+      if (!token) {
+        return next(new Error("You are not logged in"));
       }
 
-      // Success! Your middleware attached 'user' to req, now we move it to the socket
-      socket.data.user = (socket.request as any).user;
+      const user = await authenticateUser(token);
+
+      socket.data.user = user;
+
       next();
-    });
+    } catch (error) {
+      next(new Error(error instanceof Error ? error.message : "Authentication failed"));
+    }
   });
 }
