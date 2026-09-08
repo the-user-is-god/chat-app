@@ -6,7 +6,8 @@ import { registerTypingHandler } from "./handlers/typing.handler.js";
 
 export function registerConnectionHandlers(io: Server) {
   io.on("connection", (socket) => {
-    logger.info(`Client Connected: ${socket.id}`);
+    const user = socket.data.user;
+    logger.info(`Client Connected: ${socket.id}, Authenticated user: ${user.id}`);
 
     // handlers
     registerChannelHandlers(socket);

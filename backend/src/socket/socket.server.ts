@@ -2,6 +2,8 @@ import { ENV } from "@config/env.js";
 import type { Server as HttpServer } from "node:http";
 import { Server } from "socket.io";
 import { registerConnectionHandlers } from "./socket.register.js";
+import cookieParser from "cookie-parser";
+import { socketAuthMiddleware } from "./middlewares/auth.socket.js";
 
 let io: Server;
 
@@ -12,6 +14,11 @@ export function initializeSocket(httpServer: HttpServer) {
       credentials: true,
     },
   });
+
+  io.engine.use(cookieParser());
+
+  socketAuthMiddleware(io);
+
   registerConnectionHandlers(io);
   return io;
 }
