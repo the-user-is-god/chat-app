@@ -13,6 +13,7 @@ export function initializeSocket(httpServer: HttpServer) {
       origin: ENV.FRONTEND_URL || "http://localhost:3000",
       credentials: true,
     },
+    cleanupEmptyChildNamespaces: true,
   });
 
   io.engine.use(cookieParser());
