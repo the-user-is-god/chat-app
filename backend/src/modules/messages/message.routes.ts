@@ -1,8 +1,13 @@
 import { protect, requireVerification } from "@common/middleware/auth/auth.middleware.js";
 import { Router } from "express";
-import { deleteMessage, getMessages, sendMessage } from "./message.controller.js";
+import { deleteMessage, editMessage, getMessages, sendMessage } from "./message.controller.js";
 import { validate } from "@common/middleware/validation.middleware.js";
-import { getMessagesQuerySchema, sendMessageSchema } from "./message.validation.js";
+import {
+  getMessagesQuerySchema,
+  messageParamsSchema,
+  sendMessageSchema,
+  updateMessageSchema,
+} from "./message.validation.js";
 import { channelParamsSchema } from "@modules/channels/channel.validation.js";
 
 export const messageRoutes = Router();
@@ -23,9 +28,15 @@ messageRoutes.post(
   sendMessage,
 );
 
+messageRoutes.patch(
+  "/messages/:messageId",
+  validate("body", updateMessageSchema),
+  validate("params", messageParamsSchema),
+  editMessage,
+);
 // Message item operations
 messageRoutes.delete(
   "/messages/:messageId",
-  validate("params", channelParamsSchema),
+  validate("params", messageParamsSchema),
   deleteMessage,
 );

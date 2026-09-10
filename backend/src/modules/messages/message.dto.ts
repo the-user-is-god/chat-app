@@ -4,6 +4,11 @@ export interface SendMessageDTO {
   parentMessageId?: string;
 }
 
+export interface UpdateMessageDTO {
+  content: string;
+  clientMessageId?: string;
+  parentMessageId?: string;
+}
 export interface GetMessagesQueryDTO {
   cursor?: string;
   limit?: number;

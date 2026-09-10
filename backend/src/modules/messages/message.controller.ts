@@ -17,6 +17,17 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
   return ApiResponse.success(res, { message: responseData }, "Message sent successfully");
 });
 
+export const editMessage = asyncHandler(async (req: Request, res: Response) => {
+  const { messageId } = req.params;
+  if (typeof messageId !== "string") {
+    throw Errors.badRequest("Invalid or missing message ID");
+  }
+  const message = await messageService.editMessage(messageId, req.user.id, req.body);
+  const responseData = MessageMapper.toResponse(message);
+
+  return ApiResponse.success(res, { message: responseData }, "Message updated successfully");
+});
+
 export const getMessages = asyncHandler(async (req: Request, res: Response) => {
   const { channelId } = req.params;
   if (typeof channelId !== "string") {

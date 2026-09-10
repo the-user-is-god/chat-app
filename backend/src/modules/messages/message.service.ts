@@ -1,6 +1,6 @@
 import { MemberRepository } from "@modules/channelMembers/repositories/channel-member.repository.js";
 import { MessageRepository } from "./repositories/message.repository.js";
-import { GetMessagesQueryDTO, SendMessageDTO } from "./message.dto.js";
+import { GetMessagesQueryDTO, SendMessageDTO, UpdateMessageDTO } from "./message.dto.js";
 import { MessageEntity } from "./domain/message.entity.js";
 import { Errors } from "@common/utils/errors.js";
 import { ChannelPermissions } from "@modules/channelMembers/permissions/channel.permission.js";
@@ -85,6 +85,26 @@ export class MessageService {
     }
 
     return { messages: items, nextCursor };
+  }
+
+  async editMessage(
+    messageId: string,
+    userId: string,
+    dto: UpdateMessageDTO,
+  ): Promise<MessageEntity> {
+    const message = await this.messageRepository.findById(messageId);
+    if (!message) {
+      throw Errors.notFound("Message not found.");
+    }
+    const member = await this.memberRepository.findByChannelAndUser(message.channelId, userId);
+    if (!member) {
+      throw Errors.forbidden("Access Denied. You are not a member of the channel");
+    }
+
+    if (message.senderId !== userId) {
+      throw Errors.forbidden("Can only edit own messages.");
+    }
+    return this.messageRepository.update(messageId, dto);
   }
 
   async deleteMessage(messageId: string, userId: string): Promise<MessageEntity> {
