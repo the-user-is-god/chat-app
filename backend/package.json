@@ -1,7 +1,7 @@
 {
-  "name": "re-usable-backend",
+  "name": "chat-app-backend",
   "version": "1.0.0",
-  "description": "reusable backend template for me",
+  "description": "Real-time chat app backend with Express, Prisma, PostgreSQL, JWT auth, and Socket.IO",
   "license": "ISC",
   "author": "govergu",
   "type": "module",
