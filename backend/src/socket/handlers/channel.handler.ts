@@ -2,9 +2,10 @@ import { logger } from "@lib/logger.js";
 import { MemberRepository } from "@modules/channelMembers/repositories/channel-member.repository.js";
 import { joinChannelSchema } from "@socket/validations/socket.validation.js";
 import { Socket } from "socket.io";
+import { ZodError } from "zod";
 
 export function registerChannelHandlers(socket: Socket, memberRepository: MemberRepository) {
-  socket.on("channel:join", async (data) => {
+  socket.on("channel:join", async (data, ack) => {
     try {
       const { channelId } = joinChannelSchema.parse(data);
       const userId = socket.data.user.id;
@@ -30,14 +31,38 @@ export function registerChannelHandlers(socket: Socket, memberRepository: Member
         socketId: socket.id,
         channelId,
       });
+
+      // sending acknowledgement to sender
+      if (typeof ack === "function") {
+        ack({
+          success: true,
+        });
+      }
     } catch (error: any) {
+      logger.error(`Error handling channel:join ${socket.id}`, error.message);
+      // acknowledge if any error is got
+      if (typeof ack === "function") {
+        if (error instanceof ZodError) {
+          return ack({
+            success: false,
+            error: "Validation failed",
+            details: error.flatten().fieldErrors,
+          });
+        }
+
+        return ack({
+          success: false,
+          error: error.message || "Failed to process message",
+        });
+      }
+
       socket.emit("channel:error", {
         message: error.message || "Failed to join channel room",
       });
     }
   });
 
-  socket.on("channel:leave", (data: { channelId: string }) => {
+  socket.on("channel:leave", (data, ack) => {
     try {
       const { channelId } = joinChannelSchema.parse(data);
       const roomName = `channel:${channelId}`;
@@ -52,7 +77,32 @@ export function registerChannelHandlers(socket: Socket, memberRepository: Member
         socketId: socket.id,
         channelId,
       });
+
+      // sending acknowledgement to sender
+      if (typeof ack === "function") {
+        ack({
+          success: true,
+        });
+      }
     } catch (error: any) {
+      logger.error(`Error handling channel:leave ${socket.id}`, error.message);
+
+      // acknowledge if any error is got
+      if (typeof ack === "function") {
+        if (error instanceof ZodError) {
+          return ack({
+            success: false,
+            error: "Validation failed",
+            details: error.flatten().fieldErrors,
+          });
+        }
+
+        return ack({
+          success: false,
+          error: error.message || "Failed to process message",
+        });
+      }
+
       socket.emit("channel:error", {
         message: error.message || "Failed to leave channel",
       });

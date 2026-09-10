@@ -17,7 +17,7 @@ export const sendMessageEventSchema = z.object({
 
 export const updateMessageEventSchema = z.object({
   channelId: z.uuid("Invalid channel ID format"),
-  messageId: z.uuid("Invalid channel ID format"),
+  messageId: z.uuid("Invalid message ID format"),
   content: z
     .string()
     .trim() // Strips leading/trailing spaces
@@ -29,7 +29,7 @@ export const updateMessageEventSchema = z.object({
 
 export const deleteMessageEventSchema = z.object({
   channelId: z.uuid("Invalid channel ID format"),
-  messageId: z.uuid("Invalid channel ID format"),
+  messageId: z.uuid("Invalid message ID format"),
 });
 
 export type SendMessageEventDTO = z.infer<typeof sendMessageEventSchema>;
