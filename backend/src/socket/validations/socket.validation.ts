@@ -11,7 +11,7 @@ export const sendMessageEventSchema = z.object({
     .trim() // Strips leading/trailing spaces
     .min(1, "Message content cannot be empty") // Disallows empty strings
     .max(2000, "Message cannot exceed 2000 characters"), // Realistic chat length
-  clientMessageId: z.uuid("Invalid client message ID format").optional(),
+  clientMessageId: z.string().min(1).max(100).optional(),
   parentMessageId: z.uuid("Invalid parent message ID format").optional(),
 });
 
@@ -23,7 +23,7 @@ export const updateMessageEventSchema = z.object({
     .trim() // Strips leading/trailing spaces
     .min(1, "Message content cannot be empty") // Disallows empty strings
     .max(2000, "Message cannot exceed 2000 characters"), // Realistic chat length
-  clientMessageId: z.uuid("Invalid client message ID format").optional(),
+  clientMessageId: z.string().min(1).max(100).optional(),
   parentMessageId: z.uuid("Invalid parent message ID format").optional(),
 });
 

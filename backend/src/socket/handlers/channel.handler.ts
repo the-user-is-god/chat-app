@@ -38,20 +38,24 @@ export function registerChannelHandlers(socket: Socket, memberRepository: Member
   });
 
   socket.on("channel:leave", (data: { channelId: string }) => {
-    const { channelId } = joinChannelSchema.parse(data);
-    const roomName = `channel:${channelId}`;
+    try {
+      const { channelId } = joinChannelSchema.parse(data);
+      const roomName = `channel:${channelId}`;
 
-    // Remove socket from the room
-    socket.leave(roomName);
-    logger.info(`Socket ${socket.id} left room: ${roomName}`);
+      socket.leave(roomName);
 
-    // Confirm leave to the client
-    socket.emit("channel:left", { channelId });
+      logger.info(`Socket ${socket.id} left room: ${roomName}`);
 
-    // Notify remaining members
-    socket.to(roomName).emit("user:left_channel", {
-      socketId: socket.id,
-      channelId,
-    });
+      socket.emit("channel:left", { channelId });
+
+      socket.to(roomName).emit("user:left_channel", {
+        socketId: socket.id,
+        channelId,
+      });
+    } catch (error: any) {
+      socket.emit("channel:error", {
+        message: error.message || "Failed to leave channel",
+      });
+    }
   });
 }
