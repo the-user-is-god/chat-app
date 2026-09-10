@@ -1,7 +1,11 @@
 import { logger } from "@lib/logger.js";
 import { MessageMapper } from "@modules/messages/mappers/message.mapper.js";
 import { MessageService } from "@modules/messages/message.service.js";
-import { sendMessageEventSchema } from "@socket/validations/socket.validation.js";
+import {
+  deleteMessageEventSchema,
+  sendMessageEventSchema,
+  updateMessageEventSchema,
+} from "@socket/validations/socket.validation.js";
 import { Server, Socket } from "socket.io";
 
 export function registerMessageHandler(socket: Socket, io: Server, messageService: MessageService) {
@@ -33,27 +37,53 @@ export function registerMessageHandler(socket: Socket, io: Server, messageServic
     }
   });
 
-  //   socket.on("message:send", async (payload, callback) => {
-  //     try {
-  //       const input = sendMessageSchema.parse(payload);
-  //       const message = await messageService.sendMessage()
-  //       error;
-  //     } catch (error) {}
-  //   });
+  socket.on("message:edit", async (data) => {
+    try {
+      const { channelId, messageId, content, clientMessageId, parentMessageId } =
+        updateMessageEventSchema.parse(data);
+      const userId = socket.data.user.id;
 
-  socket.on("message:edit", (data: { channelId: string; messageId: string; content: string }) => {
-    const { channelId, messageId, content } = data;
-    const roomName = `channel:${channelId}`;
+      const messageEntity = await messageService.editMessage(messageId, userId, {
+        content,
+        clientMessageId,
+        parentMessageId,
+      });
 
-    // Broadcast update to all room members
-    io.to(roomName).emit("message:updated", { messageId, content });
+      const responseData = MessageMapper.toResponse(messageEntity);
+
+      // Broadcast update to all room members
+      const roomName = `channel:${channelId}`;
+      io.to(roomName).emit("message:updated", { message: responseData });
+
+      logger.info(`Message [${responseData.id}] updated to ${roomName}`);
+    } catch (error: any) {
+      logger.error(`Error handling message:edit (${socket.id}):`, error.message);
+
+      // Emit error back ONLY to the sender socket
+      socket.emit("message:error", {
+        message: error.message || "Failed to process message",
+      });
+    }
   });
 
-  socket.on("message:delete", (data: { channelId: string; messageId: string }) => {
-    const { channelId, messageId } = data;
-    const roomName = `channel:${channelId}`;
+  socket.on("message:delete", async (data) => {
+    try {
+      const { channelId, messageId } = deleteMessageEventSchema.parse(data);
+      const userId = socket.data.user.id;
 
-    // Broadcast deletion to all room members
-    io.to(roomName).emit("message:deleted", { messageId });
+      await messageService.deleteMessage(messageId, userId);
+
+      // Broadcast deletion to all room members
+      const roomName = `channel:${channelId}`;
+      io.to(roomName).emit("message:deleted", { messageId });
+      logger.info(`Message [${messageId}] deleted to ${roomName}`);
+    } catch (error: any) {
+      logger.error(`Error handling message:delete (${socket.id}):`, error.message);
+
+      // Emit error back ONLY to the sender socket
+      socket.emit("message:error", {
+        message: error.message || "Failed to process message",
+      });
+    }
   });
 }
