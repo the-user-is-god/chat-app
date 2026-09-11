@@ -4,9 +4,9 @@
  * Do not include secrets, API endpoints, or runtime environment parsers here.
  */
 export const APP_CONFIG = {
-  name: 'Enterprise Boilerplate',
+  name: 'Secret Spy',
   description:
-    'A highly scalable, feature-driven production boilerplate with Next.js, Zustand, and TanStack Query.',
+    'A highly scalable, feature-driven production chat application with Next.js, Zustand, and TanStack Query.',
   company: {
     name: 'Engine of Sainzo',
     url: 'https://kritishsainju.com.np',
