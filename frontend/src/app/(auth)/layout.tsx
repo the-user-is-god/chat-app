@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Sparkles } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { ROUTES } from '@/config/routes';
 
 interface AuthLayoutProps {
@@ -28,9 +28,9 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
           </div>
           <div className="flex flex-col">
             <span className="flex items-center gap-1.5 text-base font-extrabold tracking-tight text-white">
-              Sainzo <Sparkles className="h-3.5 w-3.5 fill-indigo-400/20 text-indigo-400" />
+              Secret Spy
             </span>
-            <span className="text-[11px] font-medium text-zinc-400">Enterprise Starter Engine</span>
+            <span className="text-[11px] font-medium text-zinc-400">It&apos;s only us here</span>
           </div>
         </Link>
 
@@ -55,7 +55,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       {/* Footer */}
       <footer className="mx-auto w-full max-w-7xl px-6 py-6 text-center text-xs text-zinc-400">
         <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p>© {new Date().getFullYear()} Sainzo Boilerplate. Clean Next.js Architecture.</p>
+          <p>© {new Date().getFullYear()} Making Communications across.</p>
           <div className="flex gap-4 font-medium text-zinc-400">
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
