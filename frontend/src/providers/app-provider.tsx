@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { QueryProvider } from './query-provider';
 import { ThemeProvider } from './theme-provider';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from 'sonner';
 
 interface AppProviderProps {
@@ -17,15 +18,17 @@ export function AppProvider({ children }: AppProviderProps) {
   return (
     <QueryProvider>
       <ThemeProvider>
-        {children}
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-          toastOptions={{
-            style: { fontFamily: 'var(--font-sans)', borderRadius: '0.75rem' },
-          }}
-        />
+        <TooltipProvider>
+          {children}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            toastOptions={{
+              style: { fontFamily: 'var(--font-sans)', borderRadius: '0.75rem' },
+            }}
+          />
+        </TooltipProvider>
       </ThemeProvider>
     </QueryProvider>
   );

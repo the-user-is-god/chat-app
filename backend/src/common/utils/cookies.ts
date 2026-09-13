@@ -7,10 +7,11 @@ export const setTokenCookie = (
   token: string,
   expiresInSeconds: number,
 ) => {
+  const isProduction = ENV.NODE_ENV === "production";
   res.cookie(name, token, {
     httpOnly: true, // XSS protection
-    secure: ENV.NODE_ENV === "production",
-    sameSite: "none", // CSRF protection for modern browsers
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax", // CSRF protection for modern browsers
     maxAge: expiresInSeconds * 1000, // Convert to milliseconds
   });
 };

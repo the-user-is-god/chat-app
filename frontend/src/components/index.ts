@@ -5,6 +5,8 @@
 export { PageHeader } from './common/page-header';
 export { StatusDisplay } from './feedback/status-display';
 export { PageContainer } from './layout/page-container';
+export { AppSidebar } from './layout/app-sidebar';
+export { DashboardHeader } from './layout/dashboard-header';
 
 // Append to src/components/index.ts
 export { FormField } from './common/form-field';
