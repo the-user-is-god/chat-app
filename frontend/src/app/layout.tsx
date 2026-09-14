@@ -1,18 +1,9 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/providers/app-provider';
 
-const sansFont = Plus_Jakarta_Sans({
-  variable: '--font-sans',
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+const sansFont = { variable: '--font-sans' };
+const geistMono = { variable: '--font-geist-mono' };
 
 export const metadata: Metadata = {
   title: 'Secret Spy',
