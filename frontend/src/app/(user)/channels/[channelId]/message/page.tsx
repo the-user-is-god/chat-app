@@ -444,7 +444,7 @@ export default function MessagePage() {
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={`Message #${MOCK_CHANNEL.name}`}
-                className="h-auto flex-1 border-0 bg-transparent p-0 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-0 focus-visible:ring-0"
+                className="h-10 flex-1 border-0 bg-transparent p-2 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-0 focus-visible:ring-0"
               />
 
               <div className="flex shrink-0 items-center gap-1">
