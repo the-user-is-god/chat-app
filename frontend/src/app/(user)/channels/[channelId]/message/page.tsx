@@ -466,7 +466,7 @@ export default function MessagePage() {
               </div>
             </div>
 
-            <p className="mt-1.5 text-center text-[11px] text-zinc-700">
+            <p className="mt-1 text-center text-[11px] text-zinc-700">
               Press{' '}
               <kbd className="rounded bg-zinc-800 px-1 py-0.5 font-mono text-[10px]">Enter</kbd> to
               send, <kbd className="rounded bg-zinc-800 px-1 py-0.5 font-mono text-[10px]">Esc</kbd>{' '}

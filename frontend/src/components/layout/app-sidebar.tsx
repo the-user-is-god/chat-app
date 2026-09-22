@@ -49,13 +49,13 @@ import { toast } from '@/utils/toast';
 const navMain = [
   {
     title: 'Explore',
-    url: '/dashboard?tab=explore',
+    url: '/explore',
     icon: Compass,
     badge: 'New',
   },
   {
     title: 'Create Channel',
-    url: '/dashboard?tab=messages',
+    url: '/channels/create',
     icon: CirclePlus,
   },
   {
@@ -69,7 +69,7 @@ const navMain = [
 const channels = [
   {
     name: 'channel1',
-    url: '/dashboard?channel=channel1',
+    url: '/channels/1234/message',
     unread: 2,
   },
   {
