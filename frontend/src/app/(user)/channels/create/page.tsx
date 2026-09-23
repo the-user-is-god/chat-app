@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { useSetHeader } from '@/providers/header-provider';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -115,6 +116,10 @@ export default function CreateChannelPage() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   const nameSlug = slugify(form.name);
+
+  useSetHeader({
+    title: 'Create a Channel',
+  });
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const slug = slugify(e.target.value);

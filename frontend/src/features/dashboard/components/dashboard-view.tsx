@@ -4,10 +4,14 @@ import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Compass, Hash, Sparkles, PanelLeft, User, Activity } from 'lucide-react';
 import { useCurrentUser } from '@/features/auth/hooks/use-current-user';
+import { useSetHeader } from '@/providers/header-provider';
 
 export function DashboardView() {
   const { user } = useCurrentUser();
   const searchParams = useSearchParams();
+  useSetHeader({
+    title: 'Dashboard',
+  });
 
   const activeChannel = searchParams.get('channel');
   const activeTab = searchParams.get('tab');

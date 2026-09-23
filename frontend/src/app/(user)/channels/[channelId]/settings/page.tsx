@@ -684,7 +684,7 @@ export default function ChannelSettingsPage() {
       </Button>
 
       <div className="mb-6 flex items-start gap-4">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 text-sm font-bold text-white shadow-md shadow-indigo-950">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-indigo-600 to-purple-600 text-sm font-bold text-white shadow-md shadow-indigo-950">
           {MOCK_CHANNEL.name[0].toUpperCase()}
         </div>
         <div>

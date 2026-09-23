@@ -5,6 +5,7 @@ import { QueryProvider } from './query-provider';
 import { ThemeProvider } from './theme-provider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from 'sonner';
+import { HeaderProvider } from './header-provider';
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ export function AppProvider({ children }: AppProviderProps) {
     <QueryProvider>
       <ThemeProvider>
         <TooltipProvider>
-          {children}
+          <HeaderProvider>{children}</HeaderProvider>
           <Toaster
             position="top-right"
             richColors

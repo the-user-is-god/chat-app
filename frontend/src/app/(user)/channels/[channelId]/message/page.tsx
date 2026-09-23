@@ -32,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useSetHeader } from '@/providers/header-provider';
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -267,6 +268,14 @@ export default function MessagePage() {
   const [replyTarget, setReplyTarget] = useState<Message | null>(null);
   const [membersOpen, setMembersOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useSetHeader(
+    {
+      title: `#${MOCK_CHANNEL.name}`,
+      actions: <Users className="size-4" />, // etc.
+    },
+    [MOCK_CHANNEL.name] // re-run if the channel changes
+  );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
