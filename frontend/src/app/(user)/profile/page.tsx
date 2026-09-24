@@ -225,6 +225,7 @@ function ChannelsTab() {
         <Button
           size="sm"
           className="bg-indigo-600 hover:bg-indigo-500"
+          nativeButton={false}
           render={<Link href="/channels/create" />}
         >
           <Hash className="size-3.5" />
@@ -270,6 +271,7 @@ function ChannelsTab() {
                     variant="ghost"
                     size="icon-sm"
                     className="text-zinc-500 hover:text-zinc-200"
+                    nativeButton={false}
                     render={<Link href={`/channels/${ch.id}/message`} />}
                   >
                     <Hash className="size-4" />
@@ -278,6 +280,7 @@ function ChannelsTab() {
                     variant="ghost"
                     size="icon-sm"
                     className="text-zinc-500 hover:text-zinc-200"
+                    nativeButton={false}
                     render={<Link href={`/channels/${ch.id}/settings`} />}
                   >
                     <Settings className="size-4" />

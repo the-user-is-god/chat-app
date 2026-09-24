@@ -153,6 +153,7 @@ export default function CreateChannelPage() {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button
             className="bg-indigo-600 hover:bg-indigo-500"
+            nativeButton={false}
             render={<Link href="/channels/new/message" />}
           >
             <Hash className="size-4" />
@@ -181,6 +182,7 @@ export default function CreateChannelPage() {
         variant="ghost"
         size="sm"
         className="mb-6 gap-1.5 text-zinc-400 hover:text-zinc-200"
+        nativeButton={false}
         render={<Link href="/explore" />}
       >
         <ArrowLeft className="size-4" />
@@ -345,6 +347,7 @@ export default function CreateChannelPage() {
             type="button"
             variant="outline"
             className="border-zinc-700 text-zinc-400"
+            nativeButton={false}
             render={<Link href="/explore" />}
           >
             Cancel

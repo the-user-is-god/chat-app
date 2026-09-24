@@ -423,16 +423,18 @@ function MembersTab() {
                 {!isOwner && (
                   <div className="flex shrink-0 items-center gap-1">
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="gap-1 text-xs text-zinc-500 hover:text-zinc-200"
-                        >
-                          Change Role
-                          <ChevronDown className="size-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="gap-1 text-xs text-zinc-500 hover:text-zinc-200"
+                          >
+                            Change Role
+                            <ChevronDown className="size-3" />
+                          </Button>
+                        }
+                      ></DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-36">
                         {ROLES.map((r) => (
                           <DropdownMenuItem
@@ -671,12 +673,13 @@ export default function ChannelSettingsPage() {
   const isPrivate = MOCK_CHANNEL.visibility === 'PRIVATE';
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+    <div className="mx-auto w-full px-4 py-6 sm:px-6">
       {/* ── Back + Header ── */}
       <Button
         variant="ghost"
         size="sm"
         className="mb-6 gap-1.5 text-zinc-400 hover:text-zinc-200"
+        nativeButton={false}
         render={<Link href={`/channels/${channelId}/message`} />}
       >
         <ArrowLeft className="size-4" />

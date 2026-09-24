@@ -150,6 +150,7 @@ function ChannelCard({ channel }: { channel: PublicChannel }) {
               size="sm"
               variant="outline"
               className="border-zinc-700 text-zinc-400"
+              nativeButton={false}
               render={<Link href={`/channels/${channel.id}/message`} />}
             >
               <MessageCircle className="size-3.5" />
@@ -159,6 +160,7 @@ function ChannelCard({ channel }: { channel: PublicChannel }) {
             <Button
               size="sm"
               className="bg-indigo-600 text-white hover:bg-indigo-500"
+
               onClick={() => setJoined(true)}
             >
               Join
@@ -223,7 +225,7 @@ export default function ExplorePage() {
   const trending = [...MOCK_CHANNELS].sort((a, b) => b.memberCount - a.memberCount).slice(0, 3);
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-8 px-4 py-6 sm:px-6">
+    <div className="mx-auto w-full space-y-8 px-4 py-6 sm:px-6">
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -237,6 +239,7 @@ export default function ExplorePage() {
         </div>
         <Button
           className="shrink-0 bg-indigo-600 hover:bg-indigo-500"
+          nativeButton={false}
           render={<Link href="/channels/create" />}
         >
           <Hash className="size-4" />
