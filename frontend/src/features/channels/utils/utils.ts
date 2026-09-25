@@ -1,4 +1,4 @@
-import { CreateChannelForm, CreateChannelFormErrors } from '../types/channel.types';
+import { ChannelRole, CreateChannelForm, CreateChannelFormErrors } from '../types/channel.types';
 
 // utility functions for message
 export function formatTime(iso: string) {
@@ -44,3 +44,29 @@ export function validateCreateChannelForm(form: CreateChannelForm): CreateChanne
   }
   return errors;
 }
+
+// settings
+
+export function formatShortDate(iso: string) {
+  return new Date(iso).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export function truncateCode(code: string) {
+  return `${code.slice(0, 8)}…`;
+}
+
+export const ROLE_STYLES: Record<ChannelRole, string> = {
+  OWNER: 'bg-amber-500/15 text-amber-400',
+  ADMIN: 'bg-indigo-500/15 text-indigo-400',
+  MODERATOR: 'bg-cyan-500/15 text-cyan-400',
+  MEMBER: 'bg-zinc-700/40 text-zinc-400',
+  VIEWER: 'bg-zinc-800/60 text-zinc-600',
+};
+
+// export const ROLE_ICON: Record<ChannelRole, React.ReactNode> = {
+//   OWNER: <Crown className="size-3" />,
+//   ADMIN: <Shield className="size-3" />,
+//   MODERATOR: <Shield className="size-3" />,
+//   MEMBER: <Users className="size-3" />,
+//   VIEWER: <Users className="size-3" />,
+// };
