@@ -15,3 +15,13 @@ export interface Message {
   isEdited?: boolean;
   replyTo?: { senderName: string; content: string } | null;
 }
+
+export type Visibility = 'PUBLIC' | 'PRIVATE';
+
+export interface CreateChannelForm {
+  name: string;
+  description: string;
+  visibility: Visibility;
+}
+
+export type CreateChannelFormErrors = Partial<Record<keyof CreateChannelForm, string>>;

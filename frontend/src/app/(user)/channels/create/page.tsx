@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Lock, Globe, Hash, Info, Loader2, Check, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { Lock, Globe, Hash, Info, Loader2, Check, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,116 +10,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useSetHeader } from '@/providers/header-provider';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Visibility = 'PUBLIC' | 'PRIVATE';
-
-interface FormState {
-  name: string;
-  description: string;
-  visibility: Visibility;
-}
-
-type FormErrors = Partial<Record<keyof FormState, string>>;
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')
-    .slice(0, 32);
-}
-
-function validate(form: FormState): FormErrors {
-  const errors: FormErrors = {};
-  if (!form.name.trim()) {
-    errors.name = 'Channel name is required.';
-  } else if (form.name.length < 2) {
-    errors.name = 'Channel name must be at least 2 characters.';
-  } else if (!/^[a-z0-9-]+$/.test(form.name)) {
-    errors.name = 'Only lowercase letters, numbers, and hyphens are allowed.';
-  }
-  return errors;
-}
-
-// ─── Visibility Option ────────────────────────────────────────────────────────
-
-function VisibilityOption({
-  value,
-  selected,
-  onSelect,
-}: {
-  value: Visibility;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const isPublic = value === 'PUBLIC';
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`flex flex-1 flex-col gap-2 rounded-xl border p-4 text-left transition-all outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 ${
-        selected
-          ? 'border-indigo-500 bg-indigo-500/10'
-          : 'border-zinc-700 bg-zinc-900 hover:border-zinc-600'
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <div
-          className={`flex size-9 items-center justify-center rounded-lg ${
-            isPublic ? 'bg-emerald-500/15' : 'bg-amber-500/15'
-          }`}
-        >
-          {isPublic ? (
-            <Globe className="size-5 text-emerald-500" />
-          ) : (
-            <Lock className="size-5 text-amber-500" />
-          )}
-        </div>
-        <div
-          className={`flex size-5 items-center justify-center rounded-full border-2 transition-colors ${
-            selected ? 'border-indigo-500 bg-indigo-500' : 'border-zinc-600'
-          }`}
-        >
-          {selected && <Check className="size-3 text-white" />}
-        </div>
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-zinc-100">{isPublic ? 'Public' : 'Private'}</p>
-        <p className="mt-0.5 text-xs text-zinc-500">
-          {isPublic
-            ? 'Anyone can find and join this channel. Perfect for open communities.'
-            : 'Only invited members can join. Ideal for team or sensitive discussions.'}
-        </p>
-      </div>
-      {selected && (
-        <Badge variant={isPublic ? 'success' : 'warning'} className="self-start text-[11px]">
-          {isPublic ? 'Public' : 'Private'} selected
-        </Badge>
-      )}
-    </button>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+import { VisibilityOption } from '@/features/channels/components/visibility-option';
+import { slugify, validateCreateChannelForm } from '@/features/channels/utils/utils';
+import {
+  CreateChannelForm,
+  CreateChannelFormErrors,
+  Visibility,
+} from '@/features/channels/types/channel.types';
 
 export default function CreateChannelPage() {
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState<CreateChannelForm>({
     name: '',
     description: '',
     visibility: 'PUBLIC',
   });
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<CreateChannelFormErrors>({});
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   const nameSlug = slugify(form.name);
 
-  useSetHeader({
-    title: 'Create a Channel',
-  });
+  useSetHeader({ title: 'Create a Channel' });
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const slug = slugify(e.target.value);
@@ -129,7 +39,7 @@ export default function CreateChannelPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const errs = validate(form);
+    const errs = validateCreateChannelForm(form);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -138,7 +48,6 @@ export default function CreateChannelPage() {
     setTimeout(() => setStatus('success'), 1400);
   };
 
-  // ── Success state ──────────────────────────────────────────────────────────
   if (status === 'success') {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center justify-center py-20 text-center">
@@ -174,10 +83,8 @@ export default function CreateChannelPage() {
     );
   }
 
-  // ── Form ──────────────────────────────────────────────────────────────────
   return (
     <div className="mx-auto w-full px-4 sm:px-6">
-      {/* Back */}
       <Button
         variant="ghost"
         size="sm"
@@ -189,7 +96,6 @@ export default function CreateChannelPage() {
         Back to Explore
       </Button>
 
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight text-zinc-100">Create a Channel</h1>
         <p className="mt-1 text-sm text-zinc-500">
@@ -200,7 +106,6 @@ export default function CreateChannelPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex w-full flex-wrap gap-6">
           <div className="flex flex-col gap-6">
-            {/* Channel Name */}
             <Card className="border-zinc-800 bg-zinc-900">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
@@ -240,7 +145,6 @@ export default function CreateChannelPage() {
               </CardContent>
             </Card>
 
-            {/* Description */}
             <Card className="border-zinc-800 bg-zinc-900">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
@@ -268,7 +172,6 @@ export default function CreateChannelPage() {
           </div>
 
           <div className="flex flex-col gap-6">
-            {/* Visibility */}
             <Card className="border-zinc-800 bg-zinc-900">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-base text-zinc-100">
@@ -303,7 +206,6 @@ export default function CreateChannelPage() {
               </CardContent>
             </Card>
 
-            {/* Preview */}
             <Card className="border-zinc-800 bg-zinc-900">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base text-zinc-100">Preview</CardTitle>
@@ -341,7 +243,6 @@ export default function CreateChannelPage() {
         </div>
         <Separator className="bg-zinc-800" />
 
-        {/* Submit */}
         <div className="flex justify-end gap-3">
           <Button
             type="button"
