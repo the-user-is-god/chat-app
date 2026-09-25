@@ -55,3 +55,18 @@ export interface ChannelDetail {
   memberCount: number;
   createdAt: string;
 }
+
+export type ChannelCategory = 'trending' | 'technology' | 'design' | 'general';
+
+export interface PublicChannel {
+  id: string;
+  name: string;
+  description: string;
+  memberCount: number;
+  messageCount: number;
+  visibility: 'PUBLIC';
+  category: ChannelCategory;
+  isJoined: boolean;
+}
+
+export type ExploreCategory = 'all' | ChannelCategory;

@@ -70,3 +70,20 @@ export const ROLE_STYLES: Record<ChannelRole, string> = {
 //   MEMBER: <Users className="size-3" />,
 //   VIEWER: <Users className="size-3" />,
 // };
+
+// formatShortDate, truncateCode, ROLE_STYLES, ROLE_ICON stay as-is
+
+export function formatCount(n: number) {
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  return String(n);
+}
+
+// Distinct from getInitials (splits on ' ' for people's names) —
+// this splits on '-' for channel slugs like "next-js" → "NJ"
+export function getChannelInitials(name: string) {
+  return name
+    .split('-')
+    .map((p) => p[0].toUpperCase())
+    .join('')
+    .slice(0, 2);
+}
