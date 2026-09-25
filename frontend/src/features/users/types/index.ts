@@ -10,3 +10,11 @@ export interface UserListFilters {
   page: number;
   limit: number;
 }
+
+export interface MyChannel {
+  id: string;
+  name: string;
+  visibility: 'PUBLIC' | 'PRIVATE';
+  memberCount: number;
+  createdAt: string;
+}

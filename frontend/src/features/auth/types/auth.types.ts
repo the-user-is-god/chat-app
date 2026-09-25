@@ -5,9 +5,11 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role: 'USER' | 'ADMIN';
   isVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
+  isBanned: boolean;
+  avatar: string | null;
+  joinedAt: string;
 }
 
 /**
