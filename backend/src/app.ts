@@ -9,9 +9,8 @@ import { userRoutes } from "@modules/users/user.routes.js";
 import { applySecurityMiddlewares } from "@common/middleware/security.middleware.js";
 import { healthRoutes } from "@modules/health/health.route.js";
 import { channelRoutes } from "@modules/channels/channel.routes.js";
-import { memberRoutes } from "@modules/channelMembers/channel-member.routes.js";
-import { invitationRoutes } from "@modules/invitations/invitation.routes.js";
-import { messageRoutes } from "@modules/messages/message.routes.js";
+import { invitationRoutes } from "@modules/invitations/routes/invitation.routes.js";
+import { messageRoutes } from "@modules/messages/routes/message.routes.js";
 
 const app = express();
 
@@ -28,7 +27,6 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/health", healthRoutes);
 app.use("/api/v1/channels", channelRoutes);
-app.use("/api/v1/members", memberRoutes);
 app.use("/api/v1/invitations", invitationRoutes);
 app.use("/api/v1/messages", messageRoutes);
 

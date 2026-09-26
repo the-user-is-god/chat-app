@@ -1,13 +1,8 @@
 import { Router } from "express";
 import { protect, requireVerification } from "@common/middleware/auth/auth.middleware.js";
-import { createInvite, joinWithInvite, revokeInvite } from "./invitation.controller.js";
-import {
-  createInvitationSchema,
-  inviteParamsSchema,
-  joinWithInviteSchema,
-} from "./invitation.validation.js";
+import { joinWithInvite, revokeInvite } from "../invitation.controller.js";
+import { inviteParamsSchema, joinWithInviteSchema } from "../invitation.validation.js";
 import { validate } from "@common/middleware/validation.middleware.js";
-import { channelParamsSchema } from "@modules/channels/channel.validation.js";
 
 export const invitationRoutes = Router();
 
@@ -16,13 +11,6 @@ invitationRoutes.use(protect, requireVerification);
 // Join channel via invitation code
 invitationRoutes.post("/join", validate("body", joinWithInviteSchema), joinWithInvite);
 
-// Channel specific invite management
-invitationRoutes.post(
-  "/channels/:channelId/invites",
-  validate("params", channelParamsSchema),
-  validate("body", createInvitationSchema),
-  createInvite,
-);
 invitationRoutes.patch(
   "/invites/:inviteId/revoke",
   validate("params", inviteParamsSchema),

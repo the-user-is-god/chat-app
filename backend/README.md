@@ -82,6 +82,83 @@ backend/
 └── README.md
 ```
 
+## API Endpoints
+
+All REST endpoints are mounted under the `/api/v1` prefix. Endpoints marked **Auth** require a valid session (cookie or bearer token depending on middleware); **Verified** additionally requires a verified email.
+
+### Auth — `/api/v1/auth`
+
+| Method | Endpoint               | Access | Description                        |
+| ------ | ---------------------- | ------ | ---------------------------------- |
+| POST   | `/register`            | Public | Register a new user                |
+| POST   | `/login`               | Public | Log in and receive session tokens  |
+| GET    | `/refresh`             | Public | Rotate/refresh the access token    |
+| GET    | `/verify-email`        | Public | Verify email via token link        |
+| POST   | `/resend-verification` | Public | Resend the verification email      |
+| POST   | `/forgot-password`     | Public | Request a password reset email     |
+| POST   | `/reset-password`      | Public | Reset password using a reset token |
+| GET    | `/me`                  | Auth   | Get the current authenticated user |
+| POST   | `/logout`              | Auth   | Log out and invalidate the session |
+
+### Users — `/api/v1/users`
+
+| Method | Endpoint   | Access          | Description                       |
+| ------ | ---------- | --------------- | --------------------------------- |
+| PATCH  | `/profile` | Auth + Verified | Update the current user's profile |
+
+### Health — `/api/v1/health`
+
+| Method | Endpoint | Access | Description                     |
+| ------ | -------- | ------ | ------------------------------- |
+| GET    | `/`      | Public | General health check            |
+| GET    | `/live`  | Public | Liveness probe                  |
+| GET    | `/ready` | Public | Readiness probe (DB/deps check) |
+
+### Channels — `/api/v1/channels`
+
+| Method | Endpoint      | Access          | Description                       |
+| ------ | ------------- | --------------- | --------------------------------- |
+| POST   | `/`           | Auth + Verified | Create a new channel              |
+| GET    | `/me`         | Auth + Verified | List channels the user has joined |
+| GET    | `/`           | Public          | List public channels              |
+| GET    | `/:channelId` | Public          | Get a single channel by ID        |
+
+### Channel Members — `/api/v1/channels/:channelId/members`
+
+| Method | Endpoint | Access          | Description                            |
+| ------ | -------- | --------------- | -------------------------------------- |
+| GET    | `/`      | Auth + Verified | List members of a channel              |
+| GET    | `/me`    | Auth + Verified | Get the current user's membership info |
+| POST   | `/join`  | Auth + Verified | Join a public channel                  |
+| DELETE | `/leave` | Auth + Verified | Leave a channel                        |
+
+### Channel Messages — `/api/v1/channels/:channelId/messages`
+
+| Method | Endpoint | Access          | Description                        |
+| ------ | -------- | --------------- | ---------------------------------- |
+| GET    | `/`      | Auth + Verified | Get message history for a channel  |
+| POST   | `/`      | Auth + Verified | Send a message to a channel (HTTP) |
+
+### Messages — `/api/v1/messages`
+
+| Method | Endpoint      | Access          | Description      |
+| ------ | ------------- | --------------- | ---------------- |
+| PATCH  | `/:messageId` | Auth + Verified | Edit a message   |
+| DELETE | `/:messageId` | Auth + Verified | Delete a message |
+
+### Channel Invitations — `/api/v1/channels/:channelId/invitations`
+
+| Method | Endpoint | Access          | Description                        |
+| ------ | -------- | --------------- | ---------------------------------- |
+| POST   | `/`      | Auth + Verified | Create an invitation for a channel |
+
+### Invitations — `/api/v1/invitations`
+
+| Method | Endpoint            | Access          | Description                         |
+| ------ | ------------------- | --------------- | ----------------------------------- |
+| POST   | `/join`             | Auth + Verified | Join a channel using an invite code |
+| PATCH  | `/:inviteId/revoke` | Auth + Verified | Revoke an existing invitation       |
+
 ## Socket Events
 
 The server currently registers these socket events:
