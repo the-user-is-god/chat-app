@@ -1,4 +1,4 @@
-import { ChannelRole, CreateChannelForm, CreateChannelFormErrors } from '../types/channel.types';
+import { ChannelRole, CreateChannelInput, CreateChannelFormErrors } from '../types/channel.types';
 
 // utility functions for message
 export function formatTime(iso: string) {
@@ -33,7 +33,7 @@ export function slugify(value: string) {
     .slice(0, 32);
 }
 
-export function validateCreateChannelForm(form: CreateChannelForm): CreateChannelFormErrors {
+export function validateCreateChannelForm(form: CreateChannelInput): CreateChannelFormErrors {
   const errors: CreateChannelFormErrors = {};
   if (!form.name.trim()) {
     errors.name = 'Channel name is required.';

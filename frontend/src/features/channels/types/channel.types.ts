@@ -6,25 +6,15 @@ export interface Channel {
   memberCount: number;
 }
 
-export interface Message {
-  id: string;
-  senderId: string;
-  senderName: string;
-  content: string;
-  createdAt: string;
-  isEdited?: boolean;
-  replyTo?: { senderName: string; content: string } | null;
-}
-
 export type Visibility = 'PUBLIC' | 'PRIVATE';
 
-export interface CreateChannelForm {
+export interface CreateChannelInput {
   name: string;
   description: string;
   visibility: Visibility;
 }
 
-export type CreateChannelFormErrors = Partial<Record<keyof CreateChannelForm, string>>;
+export type CreateChannelFormErrors = Partial<Record<keyof CreateChannelInput, string>>;
 
 export type ChannelRole = 'OWNER' | 'ADMIN' | 'MODERATOR' | 'MEMBER' | 'VIEWER';
 
@@ -35,16 +25,6 @@ export interface Member {
   email: string;
   role: ChannelRole;
   joinedAt: string;
-}
-
-export interface Invitation {
-  id: string;
-  code: string;
-  maxUses: number | null;
-  uses: number;
-  expiresAt: string | null;
-  isRevoked: boolean;
-  createdAt: string;
 }
 
 export interface ChannelDetail {

@@ -3,7 +3,7 @@
 import { Paperclip, Smile, AtSign, Send, Reply } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Message } from '../types/channel.types';
+import { Message } from '@/features/messages/types/message.types';
 
 export function MessageComposer({
   channelName,

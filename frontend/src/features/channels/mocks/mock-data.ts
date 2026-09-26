@@ -1,11 +1,6 @@
-import {
-  Channel,
-  ChannelDetail,
-  Invitation,
-  Member,
-  Message,
-  PublicChannel,
-} from '../types/channel.types';
+import { Message } from '@/features/messages/types/message.types';
+import { Channel, ChannelDetail, Member, PublicChannel } from '../types/channel.types';
+import { Invitation } from '@/features/invitations/types/invitation.types';
 
 export const MOCK_CHANNEL: Channel = {
   id: '42ec89bb',

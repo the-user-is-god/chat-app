@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { formatShortDate, truncateCode } from '../utils/utils';
-import { Invitation } from '../types/channel.types';
+import { Invitation } from '@/features/invitations/types/invitation.types';
 
 const BASE_URL = 'http://localhost:3000/join/';
 

@@ -13,13 +13,13 @@ import { useSetHeader } from '@/providers/header-provider';
 import { VisibilityOption } from '@/features/channels/components/visibility-option';
 import { slugify, validateCreateChannelForm } from '@/features/channels/utils/utils';
 import {
-  CreateChannelForm,
+  CreateChannelInput,
   CreateChannelFormErrors,
   Visibility,
 } from '@/features/channels/types/channel.types';
 
 export default function CreateChannelPage() {
-  const [form, setForm] = useState<CreateChannelForm>({
+  const [form, setForm] = useState<CreateChannelInput>({
     name: '',
     description: '',
     visibility: 'PUBLIC',

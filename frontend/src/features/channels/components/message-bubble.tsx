@@ -11,8 +11,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Message } from '../types/channel.types';
+
 import { formatTime, getInitials } from '../utils/utils';
+import { Message } from '@/features/messages/types/message.types';
 
 export function MessageBubble({
   message,

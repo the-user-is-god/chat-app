@@ -10,9 +10,9 @@ import { DateDivider } from '@/features/channels/components/date-divider';
 import { MessageComposer } from '@/features/channels/components/message-composer';
 import { MembersPanel } from '@/features/channels/components/member-panel';
 import { MOCK_CHANNEL, MOCK_MESSAGES } from '@/features/channels/mocks/mock-data';
-import { Message } from '@/features/channels/types/channel.types';
 import { formatDate } from '@/features/channels/utils/utils';
 import { useSetHeader } from '@/providers/header-provider';
+import { Message } from '@/features/messages/types/message.types';
 
 export default function MessagePage() {
   const params = useParams<{ channelId: string }>();
