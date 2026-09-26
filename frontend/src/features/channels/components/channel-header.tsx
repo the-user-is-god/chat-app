@@ -26,9 +26,9 @@ export function ChannelHeader({
         </div>
         <div>
           <h2 className="text-sm font-bold text-zinc-100">{channel.name}</h2>
-          {channel.description && (
+          {/* {channel.description && (
             <p className="max-w-xs truncate text-xs text-zinc-500">{channel.description}</p>
-          )}
+          )} */}
         </div>
       </div>
 
