@@ -49,4 +49,11 @@ export interface PublicChannel {
   isJoined: boolean;
 }
 
+export interface ExploreChannelsParams {
+  category?: ExploreCategory;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 export type ExploreCategory = 'all' | ChannelCategory;
