@@ -1,3 +1,4 @@
+// features/messages/types/message.types.ts
 export interface Message {
   id: string;
   senderId: string;
@@ -19,12 +20,12 @@ export interface UpdateMessageInput {
 
 export interface CursorPageMeta {
   nextCursor: string | null;
+  hasNextPage: boolean;
 }
 
 export interface CursorPaginatedData<T> {
-  messages: T[];
-  nextCursor: string | null;
-  //   meta: CursorPageMeta;
+  items: T[];
+  meta: CursorPageMeta;
 }
 
 export interface GetMessagesParams {

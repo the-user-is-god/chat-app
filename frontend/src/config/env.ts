@@ -11,6 +11,7 @@ const envSchema = z.object({
       message: 'NEXT_PUBLIC_APP_ENV must be development, production, or test',
     }),
   }),
+  socketUrl: z.string().url('NEXT_PUBLIC_SOCKET_URL must be a valid absolute URL'),
 });
 
 // Infer the internal type structure from our runtime validation schema
@@ -24,6 +25,7 @@ const parseEnv = (): EnvConfig => {
   const result = envSchema.safeParse({
     apiUrl: process.env.NEXT_PUBLIC_API_URL,
     environment: process.env.NEXT_PUBLIC_APP_ENV,
+    socketUrl: process.env.NEXT_PUBLIC_SOCKET_URL,
   });
 
   if (!result.success) {
