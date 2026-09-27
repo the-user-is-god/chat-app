@@ -2,52 +2,74 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Hash } from 'lucide-react';
+import { Hash, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { ChannelHeader } from '@/features/channels/components/channel-header';
 import { MessageBubble } from '@/features/channels/components/message-bubble';
 import { DateDivider } from '@/features/channels/components/date-divider';
 import { MessageComposer } from '@/features/channels/components/message-composer';
 import { MembersPanel } from '@/features/channels/components/member-panel';
-import { MOCK_CHANNEL, MOCK_MESSAGES } from '@/features/channels/mocks/mock-data';
 import { formatDate } from '@/features/channels/utils/utils';
 import { useSetHeader } from '@/providers/header-provider';
 import { Message } from '@/features/messages/types/message.types';
+import { useCurrentUser } from '@/features/auth/hooks/use-current-user';
+import { useChannelQuery } from '@/features/channels/api/channels.queries';
+import { useMessages } from '@/features/messages/hooks/useMessages';
+import { toast } from '@/utils/toast';
+import { StatusDisplay } from '@/components';
 
 export default function MessagePage() {
   const params = useParams<{ channelId: string }>();
   const channelId = params?.channelId ?? '';
 
-  const [messages, setMessages] = useState<Message[]>(MOCK_MESSAGES);
+  const { user } = useCurrentUser();
+  const { data: channel, isLoading: channelLoading } = useChannelQuery(channelId);
+  const {
+    messages,
+    isLoading: messagesLoading,
+    hasOlder,
+    fetchOlder,
+    isFetchingOlder,
+    sendMessage,
+    isSending,
+  } = useMessages(channelId);
+
   const [inputValue, setInputValue] = useState('');
   const [replyTarget, setReplyTarget] = useState<Message | null>(null);
   const [membersOpen, setMembersOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
 
-  useSetHeader({ title: `#${MOCK_CHANNEL.name}` }, [MOCK_CHANNEL.name]);
+  useSetHeader({ title: channel ? `#${channel.name}` : 'Loading...' }, [channel?.name]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSend = () => {
-    const trimmed = inputValue.trim();
-    if (!trimmed) return;
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: String(Date.now()),
-        senderId: 'me',
-        senderName: 'You',
-        content: trimmed,
-        createdAt: new Date().toISOString(),
-        replyTo: replyTarget
-          ? { senderName: replyTarget.senderName, content: replyTarget.content }
-          : null,
+  // fetch older messages  when the top sentinel comes into view
+  useEffect(() => {
+    const el = topRef.current;
+    if (!el || !hasOlder) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingOlder) fetchOlder();
       },
-    ]);
-    setInputValue('');
-    setReplyTarget(null);
+      { threshold: 1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasOlder, isFetchingOlder, fetchOlder]);
+
+  const handleSend = async () => {
+    const trimmed = inputValue.trim();
+    if (!trimmed || isSending) return;
+    try {
+      await sendMessage(trimmed, replyTarget?.id);
+      setInputValue('');
+      setReplyTarget(null);
+    } catch {
+      toast.error('Failed to send message');
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -57,6 +79,14 @@ export default function MessagePage() {
     }
     if (e.key === 'Escape' && replyTarget) setReplyTarget(null);
   };
+
+  if (channelLoading || !channel) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <StatusDisplay variant="loading" title="Loading channel…" description="" />
+      </div>
+    );
+  }
 
   const grouped: { date: string; messages: Message[] }[] = [];
   messages.forEach((msg) => {
@@ -69,7 +99,7 @@ export default function MessagePage() {
   return (
     <div className="relative flex flex-col bg-zinc-950">
       <ChannelHeader
-        channel={MOCK_CHANNEL}
+        channel={channel}
         channelId={channelId}
         onToggleMembers={() => setMembersOpen((v) => !v)}
       />
@@ -77,44 +107,40 @@ export default function MessagePage() {
       <div className="flex">
         <div className="flex flex-1 flex-col">
           <div className="py-4">
+            <div ref={topRef} className="flex justify-center py-2">
+              {isFetchingOlder && <Loader2 className="size-4 animate-spin text-zinc-600" />}
+            </div>
+
             <div className="mb-4 px-4">
               <div className="flex size-12 items-center justify-center rounded-2xl bg-zinc-800">
                 <Hash className="size-6 text-zinc-300" />
               </div>
-              <h3 className="mt-2 text-xl font-bold text-zinc-100">
-                Welcome to #{MOCK_CHANNEL.name}
-              </h3>
+              <h3 className="mt-2 text-xl font-bold text-zinc-100">Welcome to #{channel.name}</h3>
               <p className="mt-1 text-sm text-zinc-500">
-                This is the beginning of the #{MOCK_CHANNEL.name} channel.{' '}
-                {MOCK_CHANNEL.description}
+                This is the beginning of the #{channel.name} channel. {channel.description}
               </p>
             </div>
             <Separator className="mb-4 bg-zinc-800" />
 
-            {grouped.map((group) => (
-              <div key={group.date}>
-                <DateDivider label={group.date} />
-                {group.messages.map((msg) => (
-                  <MessageBubble
-                    key={msg.id}
-                    message={msg}
-                    isOwn={msg.senderId === 'me'}
-                    onReply={setReplyTarget}
-                  />
-                ))}
+            {messagesLoading ? (
+              <div className="flex justify-center py-8">
+                <Loader2 className="size-5 animate-spin text-zinc-600" />
               </div>
-            ))}
-
-            <div className="px-4 py-1">
-              <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <div className="flex gap-0.5">
-                  <span className="inline-block size-1.5 animate-bounce rounded-full bg-zinc-500 [animation-delay:0ms]" />
-                  <span className="inline-block size-1.5 animate-bounce rounded-full bg-zinc-500 [animation-delay:150ms]" />
-                  <span className="inline-block size-1.5 animate-bounce rounded-full bg-zinc-500 [animation-delay:300ms]" />
+            ) : (
+              grouped.map((group) => (
+                <div key={group.date}>
+                  <DateDivider label={group.date} />
+                  {group.messages.map((msg) => (
+                    <MessageBubble
+                      key={msg.id}
+                      message={msg}
+                      isOwn={msg.senderId === user?.id}
+                      onReply={setReplyTarget}
+                    />
+                  ))}
                 </div>
-                <span>Alice is typing…</span>
-              </div>
-            </div>
+              ))
+            )}
 
             <div ref={bottomRef} />
           </div>
@@ -124,7 +150,7 @@ export default function MessagePage() {
       </div>
 
       <MessageComposer
-        channelName={MOCK_CHANNEL.name}
+        channelName={channel.name}
         inputValue={inputValue}
         onInputChange={setInputValue}
         onKeyDown={handleKeyDown}

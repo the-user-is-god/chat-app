@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { Hash, Settings, Users, Lock, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Channel } from '../types/channel.types';
+import { ChannelDetail } from '../types/channel.types';
 
 export function ChannelHeader({
   channel,
   channelId,
   onToggleMembers,
 }: {
-  channel: Channel;
+  channel: ChannelDetail;
   channelId: string;
   onToggleMembers: () => void;
 }) {
