@@ -1,14 +1,13 @@
 // features/messages/hooks/useMessages.ts
 import { useMemo } from 'react';
-import { useMessagesQuery, useSendMessageMutation } from '../api/messages.queries';
-import { useMessageSocket } from './useMessageSocket';
-import { AppApiError } from '@/lib/api';
+import { useMessagesQuery } from '../api/messages.queries';
+import { useChannelSocket } from './useChannelSocket';
+import { useTypingIndicator } from './useTypingIndicator';
 
 export function useMessages(channelId: string) {
-  useMessageSocket(channelId);
-
   const query = useMessagesQuery(channelId);
-  const sendMutation = useSendMessageMutation(channelId);
+  const { sendMessage, editMessage, deleteMessage } = useChannelSocket(channelId);
+  const { typingUsers, notifyTyping, stopTyping } = useTypingIndicator(channelId);
 
   const messages = useMemo(
     () => query.data?.pages.flatMap((page) => page.items) ?? [],
@@ -22,9 +21,12 @@ export function useMessages(channelId: string) {
     fetchOlder: query.fetchNextPage,
     hasOlder: query.hasNextPage,
     isFetchingOlder: query.isFetchingNextPage,
-    sendMessage: (content: string, replyToId?: string) =>
-      sendMutation.mutateAsync({ content, replyToId }),
-    isSending: sendMutation.isPending,
-    error: sendMutation.error as AppApiError | null,
+
+    sendMessage,
+    editMessage,
+    deleteMessage,
+    typingUsers,
+    notifyTyping,
+    stopTyping,
   };
 }

@@ -1,5 +1,5 @@
 // features/channels/api/channels.queries.ts
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { channelsApi } from './channels.api';
 import { channelKeys } from './channels.keys';
 import type { ExploreChannelsParams } from '../types/channel.types';
@@ -10,10 +10,9 @@ import type { ExploreChannelsParams } from '../types/channel.types';
 export function useExploreChannelsQuery(params?: ExploreChannelsParams) {
   return useQuery({
     queryKey: channelKeys.explore(params),
-    queryFn: async () => {
-      const response = await channelsApi.explore(params);
-      return response.data;
-    },
+    queryFn: async () => (await channelsApi.explore(params)).data,
+    placeholderData: keepPreviousData,
+    // retry: shouldRetry,
   });
 }
 

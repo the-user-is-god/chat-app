@@ -15,7 +15,6 @@ import { Message } from '@/features/messages/types/message.types';
 import { useCurrentUser } from '@/features/auth/hooks/use-current-user';
 import { useChannelQuery } from '@/features/channels/api/channels.queries';
 import { useMessages } from '@/features/messages/hooks/useMessages';
-import { toast } from '@/utils/toast';
 import { StatusDisplay } from '@/components';
 
 export default function MessagePage() {
@@ -31,7 +30,9 @@ export default function MessagePage() {
     fetchOlder,
     isFetchingOlder,
     sendMessage,
-    isSending,
+    typingUsers,
+    notifyTyping,
+    stopTyping,
   } = useMessages(channelId);
 
   const [inputValue, setInputValue] = useState('');
@@ -60,16 +61,17 @@ export default function MessagePage() {
     return () => observer.disconnect();
   }, [hasOlder, isFetchingOlder, fetchOlder]);
 
-  const handleSend = async () => {
+  const handleSend = () => {
     const trimmed = inputValue.trim();
-    if (!trimmed || isSending) return;
-    try {
-      await sendMessage(trimmed, replyTarget?.id);
-      setInputValue('');
-      setReplyTarget(null);
-    } catch {
-      toast.error('Failed to send message');
-    }
+    if (!trimmed) return;
+    stopTyping();
+    sendMessage(
+      trimmed,
+      replyTarget?.id,
+      replyTarget ? { senderName: replyTarget.senderName, content: replyTarget.content } : null
+    );
+    setInputValue('');
+    setReplyTarget(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -141,7 +143,21 @@ export default function MessagePage() {
                 </div>
               ))
             )}
-
+            {typingUsers.length > 0 && (
+              <div className="px-4 py-1">
+                <div className="flex items-center gap-2 text-xs text-zinc-500">
+                  <div className="flex gap-0.5">
+                    <span className="inline-block size-1.5 animate-bounce rounded-full bg-zinc-500 [animation-delay:0ms]" />
+                    <span className="inline-block size-1.5 animate-bounce rounded-full bg-zinc-500 [animation-delay:150ms]" />
+                    <span className="inline-block size-1.5 animate-bounce rounded-full bg-zinc-500 [animation-delay:300ms]" />
+                  </div>
+                  <span>
+                    {typingUsers.map((u) => u.userName).join(', ')}{' '}
+                    {typingUsers.length > 1 ? 'are' : 'is'} typing…
+                  </span>
+                </div>
+              </div>
+            )}
             <div ref={bottomRef} />
           </div>
         </div>
@@ -152,11 +168,14 @@ export default function MessagePage() {
       <MessageComposer
         channelName={channel.name}
         inputValue={inputValue}
-        onInputChange={setInputValue}
         onKeyDown={handleKeyDown}
         onSend={handleSend}
         replyTarget={replyTarget}
         onCancelReply={() => setReplyTarget(null)}
+        onInputChange={(v) => {
+          setInputValue(v);
+          if (v) notifyTyping();
+        }}
       />
     </div>
   );
