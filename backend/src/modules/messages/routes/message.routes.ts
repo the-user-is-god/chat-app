@@ -9,14 +9,10 @@ export const messageRoutes = Router();
 messageRoutes.use(protect, requireVerification);
 
 messageRoutes.patch(
-  "/messages/:messageId",
+  "/:messageId",
   validate("body", updateMessageSchema),
   validate("params", messageParamsSchema),
   editMessage,
 );
 // Message item operations
-messageRoutes.delete(
-  "/messages/:messageId",
-  validate("params", messageParamsSchema),
-  deleteMessage,
-);
+messageRoutes.delete("/:messageId", validate("params", messageParamsSchema), deleteMessage);

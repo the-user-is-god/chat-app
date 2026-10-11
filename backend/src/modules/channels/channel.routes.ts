@@ -22,11 +22,12 @@ channelRoutes.post(
   createChannel,
 );
 channelRoutes.get("/me", protect, requireVerification, getJoinedChannels);
-// public apis
-channelRoutes.get("/", getPublicChannels);
-channelRoutes.get("/:channelId", validate("params", channelParamsSchema), getChannelById);
 
 // nested resources — channelId flows down via mergeParams
 channelRoutes.use("/:channelId/members", memberRoutes);
 channelRoutes.use("/:channelId/messages", channelMessageRoutes);
 channelRoutes.use("/:channelId/invitations", channelInvitationRoutes);
+
+// public apis
+channelRoutes.get("/", getPublicChannels);
+channelRoutes.get("/:channelId", validate("params", channelParamsSchema), getChannelById);

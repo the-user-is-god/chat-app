@@ -1,29 +1,24 @@
 # Chat App Backend
 
-A real-time chat backend built with Express, TypeScript, Prisma, PostgreSQL, JWT authentication, and Socket.IO. This project is focused on the chat application workflow: user auth, channel membership, message lifecycle, and live room-based communication.
+Real-time chat backend built with Express, TypeScript, Prisma, PostgreSQL, JWT authentication, HttpOnly cookies, and Socket.IO.
 
-## Overview
+## Status
 
-This backend powers the chat app with:
+Current backend progress:
 
-- REST API for authentication and user flows
-- PostgreSQL + Prisma data layer
-- Channel and member access rules
-- Message send, edit, delete, and reply support
-- Socket.IO real-time room communication for channels
-- Typing indicators and live room membership events
-- Secure JWT + cookie-based auth flow
+- REST API is implemented for auth, users, health, channels, channel members, invitations, and messages.
+- Socket.IO is wired into the HTTP server for channel, message, and typing events.
+- Prisma schema and migrations are present for users, sessions, channels, members, invitations, and messages.
+- Access-token auth supports HttpOnly cookies and bearer tokens for REST routes.
+- Socket auth supports access-token cookies, bearer authorization headers, and `handshake.auth.token`.
+- TypeScript build passes.
+- Existing auth integration tests pass.
 
-## Current Status
+Known gaps before production:
 
-The backend is in a good state for frontend integration, but it still needs a few hygiene fixes before calling it production-ready.
-
-Validated status from this workspace:
-
-- TypeScript build: passes
-- Automated test suite: passes (auth integration tests)
-- Socket logic: implemented and wired into the server
-- Missing pieces: production hardening, missing socket tests, and documentation cleanup
+- Socket and message-flow integration tests are still missing.
+- Message history, public channel listing, and member listing need stronger pagination coverage.
+- Production observability, audit logging, and deployment documentation need more detail.
 
 ## Tech Stack
 
@@ -38,27 +33,6 @@ Validated status from this workspace:
 - Zod
 - Pino
 - Nodemailer
-
-## Core Features
-
-### Authentication
-
-- Register and login
-- Email verification flow
-- Forgot-password and reset-password flows
-- Refresh-token rotation
-- Session-based token tracking
-- HttpOnly cookie auth
-- Role-aware middleware support
-
-### Chat Features
-
-- Channel membership checks
-- Join/leave room events
-- Send/edit/delete message events
-- Reply support via parent message IDs
-- Typing start/stop broadcast events
-- Room-scoped live updates
 
 ## Project Structure
 
@@ -82,104 +56,130 @@ backend/
 └── README.md
 ```
 
-## API Endpoints
+## API Base URL
 
-All REST endpoints are mounted under the `/api/v1` prefix. Endpoints marked **Auth** require a valid session (cookie or bearer token depending on middleware); **Verified** additionally requires a verified email.
+All API routes are mounted under:
 
-### Auth — `/api/v1/auth`
+```text
+/api/v1
+```
 
-| Method | Endpoint               | Access | Description                        |
-| ------ | ---------------------- | ------ | ---------------------------------- |
-| POST   | `/register`            | Public | Register a new user                |
-| POST   | `/login`               | Public | Log in and receive session tokens  |
-| GET    | `/refresh`             | Public | Rotate/refresh the access token    |
-| GET    | `/verify-email`        | Public | Verify email via token link        |
-| POST   | `/resend-verification` | Public | Resend the verification email      |
-| POST   | `/forgot-password`     | Public | Request a password reset email     |
-| POST   | `/reset-password`      | Public | Reset password using a reset token |
-| GET    | `/me`                  | Auth   | Get the current authenticated user |
-| POST   | `/logout`              | Auth   | Log out and invalidate the session |
+Protected routes accept a valid `accessToken` cookie or `Authorization: Bearer <token>` header. Routes marked `Verified` also require a verified email address.
 
-### Users — `/api/v1/users`
+## REST Endpoints
+
+### Auth
+
+Base path: `/api/v1/auth`
+
+| Method | Endpoint                    | Access | Description                                      |
+| ------ | --------------------------- | ------ | ------------------------------------------------ |
+| POST   | `/register`                 | Public | Register a new user                              |
+| POST   | `/login`                    | Public | Log in and set auth cookies                      |
+| GET    | `/refresh`                  | Public | Rotate refresh token and access token            |
+| GET    | `/verify-email?token=...`   | Public | Verify email and start a session                 |
+| POST   | `/resend-verification`      | Public | Resend verification email                        |
+| POST   | `/forgot-password`          | Public | Request a password reset email                   |
+| POST   | `/reset-password?token=...` | Public | Reset password using a reset token               |
+| GET    | `/me`                       | Auth   | Get the current authenticated user               |
+| POST   | `/logout`                   | Auth   | Revoke current refresh session and clear cookies |
+
+### User
+
+Base path: `/api/v1/user`
 
 | Method | Endpoint   | Access          | Description                       |
 | ------ | ---------- | --------------- | --------------------------------- |
 | PATCH  | `/profile` | Auth + Verified | Update the current user's profile |
 
-### Health — `/api/v1/health`
+### Health
 
-| Method | Endpoint | Access | Description                     |
-| ------ | -------- | ------ | ------------------------------- |
-| GET    | `/`      | Public | General health check            |
-| GET    | `/live`  | Public | Liveness probe                  |
-| GET    | `/ready` | Public | Readiness probe (DB/deps check) |
+Base path: `/api/v1/health`
 
-### Channels — `/api/v1/channels`
+| Method | Endpoint | Access | Description                   |
+| ------ | -------- | ------ | ----------------------------- |
+| GET    | `/`      | Public | General health check          |
+| GET    | `/live`  | Public | Liveness probe                |
+| GET    | `/ready` | Public | Readiness probe with DB check |
 
-| Method | Endpoint      | Access          | Description                       |
-| ------ | ------------- | --------------- | --------------------------------- |
-| POST   | `/`           | Auth + Verified | Create a new channel              |
-| GET    | `/me`         | Auth + Verified | List channels the user has joined |
-| GET    | `/`           | Public          | List public channels              |
-| GET    | `/:channelId` | Public          | Get a single channel by ID        |
+### Channels
 
-### Channel Members — `/api/v1/channels/:channelId/members`
+Base path: `/api/v1/channels`
 
-| Method | Endpoint | Access          | Description                            |
-| ------ | -------- | --------------- | -------------------------------------- |
-| GET    | `/`      | Auth + Verified | List members of a channel              |
-| GET    | `/me`    | Auth + Verified | Get the current user's membership info |
-| POST   | `/join`  | Auth + Verified | Join a public channel                  |
-| DELETE | `/leave` | Auth + Verified | Leave a channel                        |
+| Method | Endpoint      | Access          | Description                      |
+| ------ | ------------- | --------------- | -------------------------------- |
+| POST   | `/`           | Auth + Verified | Create a new channel             |
+| GET    | `/me`         | Auth + Verified | List channels joined by the user |
+| GET    | `/`           | Public          | List public channels             |
+| GET    | `/:channelId` | Public          | Get a public channel by ID       |
 
-### Channel Messages — `/api/v1/channels/:channelId/messages`
+### Channel Members
 
-| Method | Endpoint | Access          | Description                        |
-| ------ | -------- | --------------- | ---------------------------------- |
-| GET    | `/`      | Auth + Verified | Get message history for a channel  |
-| POST   | `/`      | Auth + Verified | Send a message to a channel (HTTP) |
+Base path: `/api/v1/channels/:channelId/members`
 
-### Messages — `/api/v1/messages`
+| Method | Endpoint | Access          | Description                   |
+| ------ | -------- | --------------- | ----------------------------- |
+| GET    | `/`      | Auth + Verified | List channel members          |
+| GET    | `/me`    | Auth + Verified | Get current user's membership |
+| POST   | `/join`  | Auth + Verified | Join a public channel         |
+| DELETE | `/leave` | Auth + Verified | Leave a channel               |
 
-| Method | Endpoint      | Access          | Description      |
-| ------ | ------------- | --------------- | ---------------- |
-| PATCH  | `/:messageId` | Auth + Verified | Edit a message   |
-| DELETE | `/:messageId` | Auth + Verified | Delete a message |
+### Channel Messages
 
-### Channel Invitations — `/api/v1/channels/:channelId/invitations`
+Base path: `/api/v1/channels/:channelId/messages`
 
-| Method | Endpoint | Access          | Description                        |
-| ------ | -------- | --------------- | ---------------------------------- |
-| POST   | `/`      | Auth + Verified | Create an invitation for a channel |
+| Method | Endpoint | Access          | Description                 |
+| ------ | -------- | --------------- | --------------------------- |
+| GET    | `/`      | Auth + Verified | Get channel message history |
+| POST   | `/`      | Auth + Verified | Send a message to a channel |
 
-### Invitations — `/api/v1/invitations`
+### Messages
+
+Base path: `/api/v1/messages`
+
+| Method | Endpoint      | Access          | Description           |
+| ------ | ------------- | --------------- | --------------------- |
+| PATCH  | `/:messageId` | Auth + Verified | Edit a message        |
+| DELETE | `/:messageId` | Auth + Verified | Soft-delete a message |
+
+### Channel Invitations
+
+Base path: `/api/v1/channels/:channelId/invitations`
+
+| Method | Endpoint | Access          | Description                 |
+| ------ | -------- | --------------- | --------------------------- |
+| POST   | `/`      | Auth + Verified | Create a channel invitation |
+
+### Invitations
+
+Base path: `/api/v1/invitations`
 
 | Method | Endpoint            | Access          | Description                         |
 | ------ | ------------------- | --------------- | ----------------------------------- |
 | POST   | `/join`             | Auth + Verified | Join a channel using an invite code |
-| PATCH  | `/:inviteId/revoke` | Auth + Verified | Revoke an existing invitation       |
+| PATCH  | `/:inviteId/revoke` | Auth + Verified | Revoke an invitation                |
 
-## Socket Events
+## Socket.IO
 
-The server currently registers these socket events:
+Socket auth accepts one of:
 
-### Channel events
+- `accessToken` cookie
+- `Authorization: Bearer <token>` handshake header
+- `auth: { token: "<access-token>" }` in the Socket.IO client options
 
-- `channel:join`
-- `channel:leave`
+Registered client events:
 
-### Message events
+| Event            | Description                                     |
+| ---------------- | ----------------------------------------------- |
+| `channel:join`   | Join a channel room after membership validation |
+| `channel:leave`  | Leave a channel room                            |
+| `message:send`   | Send a channel message                          |
+| `message:edit`   | Edit an existing message                        |
+| `message:delete` | Delete an existing message                      |
+| `typing:start`   | Broadcast typing state                          |
+| `typing:stop`    | Stop typing broadcast                           |
 
-- `message:send`
-- `message:edit`
-- `message:delete`
-
-### Typing events
-
-- `typing:start`
-- `typing:stop`
-
-### Broadcast responses
+Common emitted events:
 
 - `channel:joined`
 - `channel:left`
@@ -195,15 +195,13 @@ The server currently registers these socket events:
 
 ## Setup
 
-### Install dependencies
+Install dependencies from the backend directory:
 
 ```bash
 npm install
 ```
 
-### Environment variables
-
-Create a `.env` file in the backend root:
+Create a `.env` file in `backend/`:
 
 ```env
 PORT=5000
@@ -211,27 +209,29 @@ NODE_ENV=development
 LOG_LEVEL=info
 
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+
 JWT_ACCESS_SECRET="replace-with-a-long-random-secret"
 JWT_ACCESS_EXPIRES="15m"
 JWT_REFRESH_SECRET="replace-with-another-long-random-secret"
 JWT_REFRESH_EXPIRES="7d"
 COOKIE_EXPIRES_DAYS=7
 
-EMAIL_USER="your-gmail-address@gmail.com"
-EMAIL_PASS="your-gmail-app-password"
-EMAIL_FROM="Your App <your-gmail-address@gmail.com>"
+EMAIL_USER="your-email@example.com"
+EMAIL_PASS="your-email-app-password"
+EMAIL_FROM="Chat App <your-email@example.com>"
 
 FRONTEND_URL="http://localhost:3000"
+ALLOWED_ORIGINS="http://localhost:3000"
 ```
 
-### Prisma setup
+Generate the Prisma client and run migrations:
 
 ```bash
 npx prisma generate
 npx prisma migrate dev
 ```
 
-### Run dev server
+Run the development server:
 
 ```bash
 npm run dev
@@ -239,89 +239,39 @@ npm run dev
 
 ## Scripts
 
+| Command                | Description                                 |
+| ---------------------- | ------------------------------------------- |
+| `npm run dev`          | Start the backend with `tsx watch`          |
+| `npm run build`        | Compile TypeScript and rewrite path aliases |
+| `npm start`            | Run the compiled server from `dist/`        |
+| `npm test`             | Run Vitest tests                            |
+| `npm run lint`         | Run ESLint                                  |
+| `npm run format:check` | Check Prettier formatting                   |
+| `npm run format:fix`   | Format files with Prettier                  |
+
+## Verification
+
+Validated in this workspace:
+
 ```bash
-npm run dev
 npm run build
 npm test
-npm run lint
 ```
 
-## Important Review Findings
+Both commands pass. The normal sandbox blocks Supertest's local ephemeral port binding, so tests may need to run in an environment that allows local server binding.
 
-These are the main items I would fix before moving fully into frontend integration.
+## Next Improvements
 
-### 1. Socket auth should support more than cookie-only auth
+Recommended next backend work:
 
-The socket middleware reads only the `accessToken` cookie. That works if the frontend sends cookies, but it does not match the REST API pattern, which also supports `Authorization: Bearer ...`.
-
-Recommendation:
-
-- support both cookie auth and bearer-token auth for Socket.IO
-- keep cookie support for browser-based apps
-- add a fallback for token header auth if the frontend sends it in a custom socket auth flow
-
-### 2. Add real socket and message flow tests
-
-The current automated tests cover auth basics, but there are no tests for:
-
-- `channel:join`
-- `message:send`
-- `message:edit`
-- `message:delete`
-- typing events
-- permission enforcement for unauthorized channel access
-
-Recommendation:
-
-- write integration tests around socket event handlers
-- test membership denial and invalid payload cases
-- test idempotency protection for duplicate message sends
-
-### 3. Keep validation realistic for frontend-generated IDs
-
-The message socket schema previously required `clientMessageId` to be a UUID. In real frontend apps, this value is often a generated ID like a normal string or random key.
-
-This has been updated to accept a realistic non-empty client ID string instead of forcing UUID format.
-
-### 4. Add safer socket error handling and event contract docs
-
-The socket handlers emit generic errors back to the client, but they do not yet standardize a full event contract or a shared TypeScript socket event map.
-
-Recommendation:
-
-- define a typed socket-event contract for the frontend
-- document accepted payloads and emitted payloads
-- standardize `error` payload shape across all socket handlers
-
-### 5. Harden production behavior
-
-Before production deployment, I would still do:
-
-- rate limiting on sensitive auth endpoints
-- robust CORS config for production domains
-- log sanitization for user-generated content
-- DB query optimization checks on message history endpoints
-- more comprehensive error reporting for socket disconnections and reconnects
-
-## Known Good State
-
-This backend is already okay to start frontend work with these conditions:
-
-- APIs compile cleanly
-- auth tests pass
-- database connection and Prisma setup are in place
-- chat socket logic is integrated into the server
-- channel/message events are implemented and ready for frontend consumption
-
-## Next Step
-
-Start building the frontend and integrate with the backend using:
-
-1. auth endpoints
-2. channel membership APIs
-3. message APIs
-4. Socket.IO connection with cookie or bearer auth
-5. channel join and message event listeners
+1. Add integration tests for channel membership, invitations, messages, and Socket.IO events.
+2. Define a shared typed socket event contract for backend and frontend.
+3. Add pagination and filtering tests for public channels, members, and message history.
+4. Add per-route rate limits for auth-sensitive endpoints.
+5. Standardize error response payloads across REST and Socket.IO.
+6. Add moderation workflows for channel roles, ownership transfer, and member removal.
+7. Add API documentation from source, such as OpenAPI or generated route docs.
+8. Add production deployment notes for environment variables, migrations, logging, and health checks.
 
 ## License
 

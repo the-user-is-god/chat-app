@@ -6,7 +6,7 @@ export const sendMessageSchema = z.object({
     .trim() // Strips leading/trailing spaces
     .min(1, "Message content cannot be empty") // Disallows empty strings
     .max(2000, "Message cannot exceed 2000 characters"), // Realistic chat length
-  clientMessageId: z.uuid("Invalid client message ID format").optional(),
+  clientMessageId: z.string().trim().min(1).max(128).optional(),
   parentMessageId: z.uuid("Invalid parent message ID format").optional(),
 });
 
@@ -16,12 +16,12 @@ export const updateMessageSchema = z.object({
     .trim() // Strips leading/trailing spaces
     .min(1, "Message content cannot be empty") // Disallows empty strings
     .max(2000, "Message cannot exceed 2000 characters"), // Realistic chat length
-  clientMessageId: z.uuid("Invalid client message ID format").optional(),
+  clientMessageId: z.string().trim().min(1).max(128).optional(),
   parentMessageId: z.uuid("Invalid parent message ID format").optional(),
 });
 
 export const messageParamsSchema = z.object({
-  channelId: z.uuid("Invalid message id format"),
+  messageId: z.uuid("Invalid message id format"),
 });
 export const getMessagesQuerySchema = z.object({
   cursor: z.uuid("Invalid cursor token").optional(),

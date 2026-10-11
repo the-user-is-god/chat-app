@@ -11,8 +11,4 @@ invitationRoutes.use(protect, requireVerification);
 // Join channel via invitation code
 invitationRoutes.post("/join", validate("body", joinWithInviteSchema), joinWithInvite);
 
-invitationRoutes.patch(
-  "/invites/:inviteId/revoke",
-  validate("params", inviteParamsSchema),
-  revokeInvite,
-);
+invitationRoutes.patch("/:inviteId/revoke", validate("params", inviteParamsSchema), revokeInvite);
