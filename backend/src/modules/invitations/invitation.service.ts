@@ -90,7 +90,7 @@ export class InvitationService {
     }
 
     const member = await this.memberRepository.findByChannelAndUser(invite.channelId, userId);
-    if (!member || !ChannelPermissions.canManageChannel(member.role)) {
+    if (!member || !ChannelPermissions.canRevokeInvitation(member.role)) {
       throw Errors.forbidden("Only Channel Owners or Admins can revoke invitation links.");
     }
 

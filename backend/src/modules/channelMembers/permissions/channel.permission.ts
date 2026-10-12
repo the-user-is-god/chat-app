@@ -1,29 +1,64 @@
 import { ChannelRole } from "@generated/prisma/enums.js";
 
 export class ChannelPermissions {
-  static canManageChannel(role: ChannelRole): boolean {
+  static canUpdateSettings(role: ChannelRole): boolean {
+    return role === "OWNER";
+  }
+  // static canManageChannel(role: ChannelRole): boolean {
+  //   return role === "OWNER";
+  // }
+
+  static canChangeMemberRole(actorRole: ChannelRole, targetRole: ChannelRole): boolean {
+    if (actorRole === "OWNER") {
+      return targetRole !== "OWNER";
+    }
+
+    if (actorRole === "ADMIN") {
+      return targetRole === "MEMBER" || targetRole === "VIEWER";
+    }
+
+    return false;
+  }
+
+  static canTransferOwnership(role: ChannelRole): boolean {
     return role === "OWNER";
   }
 
-  static canManageMembers(actorRole: ChannelRole, targetRole?: ChannelRole): boolean {
-    // Only OWNER and ADMIN can manage members
-    if (actorRole !== "OWNER" && actorRole !== "ADMIN") {
-      return false;
+  static canRemoveMember(actorRole: ChannelRole, targetRole: ChannelRole): boolean {
+    if (actorRole === "OWNER") {
+      return targetRole !== "OWNER";
     }
 
-    // Admins cannot manage the OWNER or other ADMINS
-    if (actorRole === "ADMIN" && (targetRole === "OWNER" || targetRole === "ADMIN")) {
-      return false;
+    if (actorRole === "ADMIN") {
+      return targetRole === "MODERATOR" || targetRole === "MEMBER" || targetRole === "VIEWER";
     }
 
-    return true;
+    return false;
   }
+
+  // static canManageMembers(actorRole: ChannelRole, targetRole?: ChannelRole): boolean {
+  //   // Only OWNER and ADMIN can manage members
+  //   if (actorRole !== "OWNER" && actorRole !== "ADMIN") {
+  //     return false;
+  //   }
+
+  //   // Admins cannot manage the OWNER or other ADMINS
+  //   if (actorRole === "ADMIN" && (targetRole === "OWNER" || targetRole === "ADMIN")) {
+  //     return false;
+  //   }
+
+  //   return true;
+  // }
 
   /**
    * Can generate invitation codes/links for private channels
    */
   static canInvite(role: ChannelRole): boolean {
     return role === "OWNER" || role === "ADMIN" || role === "MODERATOR" || role === "MEMBER";
+  }
+
+  static canRevokeInvitation(role: ChannelRole): boolean {
+    return role === "OWNER" || role === "ADMIN";
   }
 
   /**
