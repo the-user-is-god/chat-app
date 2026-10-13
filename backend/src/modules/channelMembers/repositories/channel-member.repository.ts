@@ -32,4 +32,17 @@ export class MemberRepository extends BaseRepository<
   async deleteByChannelAndUser(channelId: string, userId: string): Promise<void> {
     await prisma.channelMember.delete({ where: { channelId_userId: { channelId, userId } } });
   }
+
+  async updateRole(
+    channelId: string,
+    targetId: string,
+    newRole: MemberEntity["role"],
+  ): Promise<MemberEntity> {
+    const updatedMember = await prisma.channelMember.update({
+      where: { channelId_userId: { channelId, userId: targetId } },
+      data: { role: newRole },
+    });
+
+    return MemberMapper.toDomainEntity(updatedMember);
+  }
 }

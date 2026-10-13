@@ -61,3 +61,17 @@ export const leaveChannel = asyncHandler(async (req: Request, res: Response) => 
 
   return ApiResponse.success(res, null, "Successfully left the channel");
 });
+
+export const updateRoleOfMember = asyncHandler(async (req: Request, res: Response) => {
+  const { channelId, targetId } = req.params;
+  if (typeof channelId !== "string" || typeof targetId !== "string") {
+    throw Errors.badRequest("Invalid or missing channel and target user ID");
+  }
+
+  const { role } = req.body;
+
+  const member = await memberService.changeRoleOfMember(channelId, req.user.id, targetId, role);
+
+  const responseData = MemberMapper.toResponse(member);
+  return ApiResponse.success(res, { member: responseData }, `Successfully changed role to ${role}`);
+});

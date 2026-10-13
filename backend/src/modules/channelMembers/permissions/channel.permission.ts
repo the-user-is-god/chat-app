@@ -8,13 +8,27 @@ export class ChannelPermissions {
   //   return role === "OWNER";
   // }
 
-  static canChangeMemberRole(actorRole: ChannelRole, targetRole: ChannelRole): boolean {
+  static canChangeMemberRole(
+    actorRole: ChannelRole,
+    targetRole: ChannelRole,
+    newRole: ChannelRole,
+  ): boolean {
+    // Nobody can assign ownership through this operation.
+    if (newRole === "OWNER") {
+      return false;
+    }
+
+    // The owner can manage every other member's role.
     if (actorRole === "OWNER") {
       return targetRole !== "OWNER";
     }
 
+    // Admins can manage ordinary members and viewers,
+    // but cannot promote them to privileged roles.
     if (actorRole === "ADMIN") {
-      return targetRole === "MEMBER" || targetRole === "VIEWER";
+      const manageableRoles: ChannelRole[] = ["MEMBER", "VIEWER"];
+
+      return manageableRoles.includes(targetRole) && manageableRoles.includes(newRole);
     }
 
     return false;

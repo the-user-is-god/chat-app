@@ -77,4 +77,40 @@ export class MemberService {
     }
     return this.channelMemberRepository.findByChannelId(channelId);
   }
+
+  async changeRoleOfMember(
+    channelId: string,
+    userId: string,
+    targetId: string,
+    newRole: MemberEntity["role"],
+  ): Promise<MemberEntity> {
+    // 1. Find the actor's membership.
+    const actor = await this.findMemberShip(channelId, userId);
+
+    if (!actor) {
+      throw Errors.forbidden("You are not a member of this channel.");
+    }
+
+    // 2. Find the target's membership.
+    const target = await this.findMemberShip(channelId, targetId);
+
+    if (!target) {
+      throw Errors.notFound("Target member not found in this channel.");
+    }
+
+    // 3. Check whether this role change is permitted.
+    const allowed = ChannelPermissions.canChangeMemberRole(actor.role, target.role, newRole);
+
+    if (!allowed) {
+      throw Errors.forbidden("You do not have permission to change this member's role.");
+    }
+
+    // 4. Avoid unnecessary updates.
+    if (target.role === newRole) {
+      return target;
+    }
+
+    // 5. Persist the change.
+    return this.channelMemberRepository.updateRole(channelId, targetId, newRole);
+  }
 }
