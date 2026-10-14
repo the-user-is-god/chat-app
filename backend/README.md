@@ -14,6 +14,7 @@ Current backend progress:
 - Security middleware applies request IDs, Helmet headers, CORS controls, and global rate limiting.
 - Channel ownership, role updates, member removal, ownership transfer, invitation limits, and message permissions are enforced in service-level controls.
 - Channels support `EVERYONE` and `MODERATORS_ONLY` messaging modes.
+- Docker support is available with a production multi-stage image and a Compose stack for API, PostgreSQL, and migrations.
 - TypeScript build passes.
 - Existing auth integration tests pass.
 
@@ -53,6 +54,8 @@ backend/
 │   ├── lib/
 │   ├── modules/
 │   └── socket/
+├── Dockerfile
+├── docker-compose.yml
 ├── package.json
 ├── prisma.config.ts
 ├── tsconfig.json
@@ -132,35 +135,35 @@ Base path: `/api/v1/health`
 
 Base path: `/`
 
-| Method | Endpoint | Access | Description                         |
-| ------ | -------- | ------ | ----------------------------------- |
+| Method | Endpoint | Access | Description                          |
+| ------ | -------- | ------ | ------------------------------------ |
 | GET    | `/`      | Public | Root uptime response for host checks |
 
 ### Channels
 
 Base path: `/api/v1/channels`
 
-| Method | Endpoint                | Access          | Description                                                                 |
-| ------ | ----------------------- | --------------- | --------------------------------------------------------------------------- |
-| POST   | `/`                     | Auth + Verified | Create a new channel and make the creator the owner                         |
-| GET    | `/me`                   | Auth + Verified | List channels joined by the user                                            |
-| GET    | `/`                     | Public          | List public channels                                                        |
-| GET    | `/:channelId`           | Public          | Get a public channel by ID                                                  |
-| PATCH  | `/:channelId/settings`  | Auth + Verified | Update owner-only channel settings: name, description, avatar, visibility, or messaging mode |
+| Method | Endpoint               | Access          | Description                                                                                  |
+| ------ | ---------------------- | --------------- | -------------------------------------------------------------------------------------------- |
+| POST   | `/`                    | Auth + Verified | Create a new channel and make the creator the owner                                          |
+| GET    | `/me`                  | Auth + Verified | List channels joined by the user                                                             |
+| GET    | `/`                    | Public          | List public channels                                                                         |
+| GET    | `/:channelId`          | Public          | Get a public channel by ID                                                                   |
+| PATCH  | `/:channelId/settings` | Auth + Verified | Update owner-only channel settings: name, description, avatar, visibility, or messaging mode |
 
 ### Channel Members
 
 Base path: `/api/v1/channels/:channelId/members`
 
-| Method | Endpoint            | Access          | Description                                        |
-| ------ | ------------------- | --------------- | -------------------------------------------------- |
-| GET    | `/`                 | Auth + Verified | List channel members                               |
-| GET    | `/me`               | Auth + Verified | Get current user's membership                      |
-| POST   | `/join`             | Auth + Verified | Join a public channel                              |
-| DELETE | `/leave`            | Auth + Verified | Leave a channel; owners must transfer ownership first |
-| PATCH  | `/:targetId/role`   | Auth + Verified | Update another member's role                       |
-| DELETE | `/:targetId`        | Auth + Verified | Remove another member from the channel             |
-| PATCH  | `/ownership`        | Auth + Verified | Transfer channel ownership to an existing member   |
+| Method | Endpoint          | Access          | Description                                           |
+| ------ | ----------------- | --------------- | ----------------------------------------------------- |
+| GET    | `/`               | Auth + Verified | List channel members                                  |
+| GET    | `/me`             | Auth + Verified | Get current user's membership                         |
+| POST   | `/join`           | Auth + Verified | Join a public channel                                 |
+| DELETE | `/leave`          | Auth + Verified | Leave a channel; owners must transfer ownership first |
+| PATCH  | `/:targetId/role` | Auth + Verified | Update another member's role                          |
+| DELETE | `/:targetId`      | Auth + Verified | Remove another member from the channel                |
+| PATCH  | `/ownership`      | Auth + Verified | Transfer channel ownership to an existing member      |
 
 ### Channel Messages
 
@@ -175,17 +178,17 @@ Base path: `/api/v1/channels/:channelId/messages`
 
 Base path: `/api/v1/messages`
 
-| Method | Endpoint      | Access          | Description                                |
-| ------ | ------------- | --------------- | ------------------------------------------ |
-| PATCH  | `/:messageId` | Auth + Verified | Edit your own message                      |
+| Method | Endpoint      | Access          | Description                                    |
+| ------ | ------------- | --------------- | ---------------------------------------------- |
+| PATCH  | `/:messageId` | Auth + Verified | Edit your own message                          |
 | DELETE | `/:messageId` | Auth + Verified | Soft-delete a message as owner/admin/moderator |
 
 ### Channel Invitations
 
 Base path: `/api/v1/channels/:channelId/invitations`
 
-| Method | Endpoint | Access          | Description                 |
-| ------ | -------- | --------------- | --------------------------- |
+| Method | Endpoint | Access          | Description                                                   |
+| ------ | -------- | --------------- | ------------------------------------------------------------- |
 | POST   | `/`      | Auth + Verified | Create a channel invitation with optional max uses and expiry |
 
 ### Invitations
@@ -282,6 +285,28 @@ Run the development server:
 
 ```bash
 npm run dev
+```
+
+## Docker
+
+The backend includes a multi-stage `Dockerfile` based on `node:24-bookworm-slim`. The builder stage installs dependencies, generates Prisma client code with a mock `DATABASE_URL`, and compiles TypeScript. The production stage installs production dependencies only, runs as the `node` user, and starts `dist/server.js` on port `10000`.
+
+Run the local Docker stack from `backend/`:
+
+```bash
+docker compose up --build
+```
+
+The Compose stack starts:
+
+- `db`: PostgreSQL 17 with a persistent `pgdata` volume.
+- `migrate`: one-shot `npx prisma migrate deploy` service that waits for the database health check.
+- `api`: production backend container using `.env`, with `DATABASE_URL` pointed at the Compose database.
+
+The API is exposed at:
+
+```text
+http://localhost:5000
 ```
 
 ## Scripts
