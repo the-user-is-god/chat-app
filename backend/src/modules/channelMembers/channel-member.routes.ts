@@ -6,6 +6,7 @@ import {
   leaveChannel,
   listMembers,
   removeMember,
+  transferOwnership,
   updateRoleOfMember,
 } from "./channel-member.controller.js";
 import { validate } from "@common/middleware/validation.middleware.js";
@@ -33,3 +34,5 @@ memberRoutes.patch(
   updateRoleOfMember,
 );
 memberRoutes.delete("/:targetId", validate("params", removeMemberParamsSchema), removeMember);
+
+memberRoutes.patch("/ownership", validate("params", channelParamsSchema), transferOwnership);

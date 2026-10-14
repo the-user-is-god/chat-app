@@ -142,4 +142,33 @@ export class MemberService {
     // 5. Remove the target's membership.
     await this.channelMemberRepository.deleteByChannelAndUser(channelId, targetId);
   }
+
+  async transferOwnership(channelId: string, actorId: string, newOwnerId: string): Promise<void> {
+    // 1. Find the current owner's membership.
+    const currentOwner = await this.findMemberShip(channelId, actorId);
+
+    if (!currentOwner) {
+      throw Errors.forbidden("You are not a member of this channel.");
+    }
+
+    // 2. Verify that the actor is the owner.
+    if (!ChannelPermissions.canTransferOwnership(currentOwner.role)) {
+      throw Errors.forbidden("Only the channel owner can transfer ownership.");
+    }
+
+    // 3. Prevent transferring ownership to yourself.
+    if (actorId === newOwnerId) {
+      throw Errors.badRequest("You are already the owner of this channel.");
+    }
+
+    // 4. Verify the new owner is already a member.
+    const newOwner = await this.findMemberShip(channelId, newOwnerId);
+
+    if (!newOwner) {
+      throw Errors.badRequest("The new owner must be a member of this channel.");
+    }
+
+    // 5. Delegate the atomic database operation.
+    await this.channelMemberRepository.transferOwnership(channelId, actorId, newOwnerId);
+  }
 }

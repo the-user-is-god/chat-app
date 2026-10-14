@@ -3,6 +3,7 @@ import { BaseRepository } from "@infrastructure/repositories/base.repository.js"
 import { MemberEntity } from "../domain/channel-member.entity.js";
 import { prisma } from "@infrastructure/db.js";
 import { MemberMapper } from "../mappers/channel-member.mapper.js";
+import { Errors } from "@common/utils/errors.js";
 
 export class MemberRepository extends BaseRepository<
   ChannelMember,
@@ -44,5 +45,58 @@ export class MemberRepository extends BaseRepository<
     });
 
     return MemberMapper.toDomainEntity(updatedMember);
+  }
+
+  async transferOwnership(
+    channelId: string,
+    currentOwnerId: string,
+    newOwnerId: string,
+  ): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      // Recheck ownership inside the transaction.
+      const owner = await tx.channelMember.findFirst({
+        where: {
+          channelId,
+          userId: currentOwnerId,
+          role: "OWNER",
+        },
+      });
+
+      if (!owner) {
+        throw Errors.forbidden("You are no longer the owner of this channel.");
+      }
+
+      // Ensure the target is still a member.
+      const target = await tx.channelMember.findFirst({
+        where: {
+          channelId,
+          userId: newOwnerId,
+        },
+      });
+
+      if (!target) {
+        throw Errors.badRequest("The new owner must be a member of this channel.");
+      }
+
+      // Promote the new owner.
+      await tx.channelMember.update({
+        where: {
+          id: target.id,
+        },
+        data: {
+          role: "OWNER",
+        },
+      });
+
+      // Demote the previous owner.
+      await tx.channelMember.update({
+        where: {
+          id: owner.id,
+        },
+        data: {
+          role: "ADMIN",
+        },
+      });
+    });
   }
 }

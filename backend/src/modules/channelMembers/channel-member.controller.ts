@@ -87,3 +87,16 @@ export const removeMember = asyncHandler(async (req: Request, res: Response) => 
 
   return ApiResponse.success(res, null, "Member removed successfully.");
 });
+
+export const transferOwnership = asyncHandler(async (req: Request, res: Response) => {
+  const { channelId } = req.params;
+  const { newOwnerId } = req.body;
+
+  if (typeof channelId !== "string") {
+    throw Errors.badRequest("Invalid channel ID.");
+  }
+
+  await memberService.transferOwnership(channelId, req.user.id, newOwnerId);
+
+  return ApiResponse.success(res, null, "Channel ownership transferred successfully.");
+});
