@@ -3,6 +3,7 @@ import { BaseRepository } from "@infrastructure/repositories/base.repository.js"
 import { ChannelEntity } from "../domain/channel.entity.js";
 import { prisma } from "@infrastructure/db.js";
 import { ChannelMapper } from "../mappers/channel.mapper.js";
+import { UpdateChannelSettingsDTO } from "../channel.dto.js";
 
 export class ChannelRepository extends BaseRepository<
   Channel,
@@ -25,5 +26,12 @@ export class ChannelRepository extends BaseRepository<
     });
 
     return channels ? ChannelMapper.toDomainEntities(channels) : null;
+  }
+
+  async updateSettings(channelId: string, data: UpdateChannelSettingsDTO): Promise<ChannelEntity> {
+    return prisma.channel.update({
+      where: { id: channelId },
+      data,
+    });
   }
 }

@@ -1,8 +1,9 @@
 import { Errors } from "@common/utils/errors.js";
-import { CreateChannelDTO } from "./channel.dto.js";
+import { CreateChannelDTO, UpdateChannelSettingsDTO } from "./channel.dto.js";
 import { ChannelEntity } from "./domain/channel.entity.js";
 import { ChannelRepository } from "./repositories/channel.repository.js";
 import { MemberRepository } from "@modules/channelMembers/repositories/channel-member.repository.js";
+import { ChannelPermissions } from "@modules/channelMembers/permissions/channel.permission.js";
 
 export class ChannelService {
   constructor(
@@ -60,5 +61,29 @@ export class ChannelService {
   async getMyChannels(userId: string): Promise<ChannelEntity[]> {
     const channels = await this.channelRepository.findJoinedChannels(userId);
     return channels ?? [];
+  }
+
+  async updateSettings(
+    channelId: string,
+    actorId: string,
+    dto: UpdateChannelSettingsDTO,
+  ): Promise<ChannelEntity> {
+    const channel = await this.channelRepository.findById(channelId);
+
+    if (!channel) {
+      throw Errors.notFound("Channel not found.");
+    }
+
+    const membership = await this.channelMemberRepository.findByChannelAndUser(channelId, actorId);
+
+    if (!membership) {
+      throw Errors.forbidden("You are not a member of this channel.");
+    }
+
+    if (!ChannelPermissions.canUpdateSettings(membership.role)) {
+      throw Errors.forbidden("Only the channel owner can update channel settings.");
+    }
+
+    return this.channelRepository.updateSettings(channelId, dto);
   }
 }

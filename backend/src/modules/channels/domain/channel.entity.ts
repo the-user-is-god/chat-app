@@ -7,4 +7,5 @@ export interface ChannelEntity {
   createdById: string;
   createdAt: Date;
   updatedAt?: Date;
+  messagingMode: "EVERYONE" | "MODERATORS_ONLY";
 }

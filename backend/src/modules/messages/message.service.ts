@@ -4,11 +4,13 @@ import { GetMessagesQueryDTO, SendMessageDTO, UpdateMessageDTO } from "./message
 import { MessageEntity } from "./domain/message.entity.js";
 import { Errors } from "@common/utils/errors.js";
 import { ChannelPermissions } from "@modules/channelMembers/permissions/channel.permission.js";
+import { ChannelRepository } from "@modules/channels/repositories/channel.repository.js";
 
 export class MessageService {
   constructor(
     private messageRepository: MessageRepository,
     private memberRepository: MemberRepository,
+    private channelRepository: ChannelRepository,
   ) {}
 
   async sendMessage(
@@ -16,13 +18,19 @@ export class MessageService {
     userId: string,
     dto: SendMessageDTO,
   ): Promise<MessageEntity> {
+    const channel = await this.channelRepository.findById(channelId);
+
+    if (!channel) {
+      throw Errors.notFound("Channel not found.");
+    }
+
     const member = await this.memberRepository.findByChannelAndUser(channelId, userId);
 
     if (!member) {
       throw Errors.forbidden("Access Denied. You are not the member of this channel");
     }
 
-    if (!ChannelPermissions.canSendMessages(member.role)) {
+    if (!ChannelPermissions.canSendMessages(member.role, channel.messagingMode)) {
       throw Errors.forbidden("You are not allowed to send messages in this channel.");
     }
     // Idempotency check: prevent duplicate sends on network retries

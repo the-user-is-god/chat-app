@@ -1,11 +1,16 @@
 import { validate } from "@common/middleware/validation.middleware.js";
 import express from "express";
-import { channelParamsSchema, createChannelSchema } from "./channel.validation.js";
+import {
+  channelParamsSchema,
+  createChannelSchema,
+  updateChannelSettingsSchema,
+} from "./channel.validation.js";
 import {
   createChannel,
   getChannelById,
   getJoinedChannels,
   getPublicChannels,
+  updateChannelSettings,
 } from "./channel.controller.js";
 import { protect, requireVerification } from "@common/middleware/auth/auth.middleware.js";
 import { memberRoutes } from "@modules/channelMembers/channel-member.routes.js";
@@ -31,3 +36,12 @@ channelRoutes.use("/:channelId/invitations", channelInvitationRoutes);
 // public apis
 channelRoutes.get("/", getPublicChannels);
 channelRoutes.get("/:channelId", validate("params", channelParamsSchema), getChannelById);
+
+channelRoutes.patch(
+  "/:channelId/settings",
+  protect,
+  requireVerification,
+  validate("params", channelParamsSchema),
+  validate("body", updateChannelSettingsSchema),
+  updateChannelSettings,
+);

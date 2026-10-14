@@ -1,4 +1,4 @@
-import { ChannelRole } from "@generated/prisma/enums.js";
+import { ChannelMessagingMode, ChannelRole } from "@generated/prisma/enums.js";
 
 export class ChannelPermissions {
   static canUpdateSettings(role: ChannelRole): boolean {
@@ -78,7 +78,10 @@ export class ChannelPermissions {
   /**
    * Can send messages in the channel (Used inside Socket.IO and REST endpoints)
    */
-  static canSendMessages(role: ChannelRole): boolean {
+  static canSendMessages(role: ChannelRole, mode: ChannelMessagingMode): boolean {
+    if (mode === "MODERATORS_ONLY") {
+      return role === "OWNER" || role === "ADMIN" || role === "MODERATOR";
+    }
     // VIEWERS are read-only
     return role !== "VIEWER";
   }

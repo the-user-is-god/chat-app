@@ -1,3 +1,5 @@
+import { ChannelMessagingMode, ChannelVisibility } from "@generated/prisma/enums.js";
+
 export interface ChannelResponseDTO {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface ChannelResponseDTO {
   createdById: string;
   createdAt: Date;
   updatedAt?: Date;
+  messagingMode: "EVERYONE" | "MODERATORS_ONLY";
 }
 
 export interface CreateChannelDTO {
@@ -14,4 +17,12 @@ export interface CreateChannelDTO {
   description?: string | null;
   avatar?: string | null;
   visibility: "PUBLIC" | "PRIVATE";
+}
+
+export interface UpdateChannelSettingsDTO {
+  name?: string;
+  description?: string | null;
+  avatar?: string | null;
+  visibility?: ChannelVisibility;
+  messagingMode?: ChannelMessagingMode;
 }

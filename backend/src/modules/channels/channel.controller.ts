@@ -4,6 +4,7 @@ import { channelService } from "./channel.factory.js";
 import { ChannelMapper } from "./mappers/channel.mapper.js";
 import { ApiResponse } from "@common/utils/apiResponse.js";
 import { Errors } from "@common/utils/errors.js";
+import { UpdateChannelSettingsDTO } from "./channel.dto.js";
 
 export const createChannel = asyncHandler(async (req: Request, res: Response) => {
   const channel = await channelService.createChannel(req.body, req.user.id);
@@ -45,5 +46,23 @@ export const getJoinedChannels = asyncHandler(async (req: Request, res: Response
     res,
     { channels: responseData },
     "Successfully fetched your channels.",
+  );
+});
+
+export const updateChannelSettings = asyncHandler(async (req: Request, res: Response) => {
+  const { channelId } = req.params;
+
+  if (typeof channelId !== "string") {
+    throw Errors.badRequest("Invalid channel ID.");
+  }
+
+  const dto: UpdateChannelSettingsDTO = req.body;
+
+  const updatedChannel = await channelService.updateSettings(channelId, req.user.id, dto);
+
+  return ApiResponse.success(
+    res,
+    ChannelMapper.toResponse(updatedChannel),
+    "Channel settings updated successfully.",
   );
 });

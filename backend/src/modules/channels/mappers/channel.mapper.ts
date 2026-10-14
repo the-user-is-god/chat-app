@@ -13,6 +13,7 @@ export class ChannelMapper {
       createdById: channel.createdById,
       createdAt: channel.createdAt,
       updatedAt: channel.updatedAt,
+      messagingMode: channel.messagingMode,
     };
   }
 
@@ -30,6 +31,7 @@ export class ChannelMapper {
       createdById: channel.createdById,
       createdAt: channel.createdAt,
       updatedAt: channel.updatedAt,
+      messagingMode: channel.messagingMode,
     };
   }
   static toManyResponse(channels: ChannelEntity[]): ChannelResponseDTO[] {
