@@ -9,3 +9,8 @@ export const updateRoleParamsSchema = z.object({
 export const updateRoleBodySchema = z.object({
   role: z.enum(["ADMIN", "MODERATOR", "MEMBER", "VIEWER"], "Invalid role target"),
 });
+
+export const removeMemberParamsSchema = z.object({
+  channelId: z.uuid("Invalid channel ID format"),
+  targetId: z.uuid("Invalid target member ID format"),
+});

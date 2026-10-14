@@ -113,4 +113,33 @@ export class MemberService {
     // 5. Persist the change.
     return this.channelMemberRepository.updateRole(channelId, targetId, newRole);
   }
+
+  async removeMember(channelId: string, userId: string, targetId: string): Promise<void> {
+    // 1. Find the actor's membership.
+    const actor = await this.findMemberShip(channelId, userId);
+
+    if (!actor) {
+      throw Errors.forbidden("You are not a member of this channel.");
+    }
+
+    // 2. Find the target's membership.
+    const target = await this.findMemberShip(channelId, targetId);
+
+    if (!target) {
+      throw Errors.notFound("Target member not found in this channel.");
+    }
+
+    // 3. Prevent self-removal through the moderation endpoint.
+    if (userId === targetId) {
+      throw Errors.badRequest("Use the leave channel operation to leave this channel.");
+    }
+
+    // 4. Check authorization.
+    if (!ChannelPermissions.canRemoveMember(actor.role, target.role)) {
+      throw Errors.forbidden("You do not have permission to remove this member.");
+    }
+
+    // 5. Remove the target's membership.
+    await this.channelMemberRepository.deleteByChannelAndUser(channelId, targetId);
+  }
 }

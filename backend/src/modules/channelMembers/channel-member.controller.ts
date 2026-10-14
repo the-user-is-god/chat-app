@@ -75,3 +75,15 @@ export const updateRoleOfMember = asyncHandler(async (req: Request, res: Respons
   const responseData = MemberMapper.toResponse(member);
   return ApiResponse.success(res, { member: responseData }, `Successfully changed role to ${role}`);
 });
+
+export const removeMember = asyncHandler(async (req: Request, res: Response) => {
+  const { channelId, targetId } = req.params;
+
+  if (typeof channelId !== "string" || typeof targetId !== "string") {
+    throw Errors.badRequest("Invalid channel ID or target member ID.");
+  }
+
+  await memberService.removeMember(channelId, req.user.id, targetId);
+
+  return ApiResponse.success(res, null, "Member removed successfully.");
+});

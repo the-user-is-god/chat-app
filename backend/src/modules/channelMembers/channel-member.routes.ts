@@ -5,11 +5,16 @@ import {
   joinPublicChannel,
   leaveChannel,
   listMembers,
+  removeMember,
   updateRoleOfMember,
 } from "./channel-member.controller.js";
 import { validate } from "@common/middleware/validation.middleware.js";
 import { channelParamsSchema } from "@modules/channels/channel.validation.js";
-import { updateRoleBodySchema, updateRoleParamsSchema } from "./channel-member.validation.js";
+import {
+  removeMemberParamsSchema,
+  updateRoleBodySchema,
+  updateRoleParamsSchema,
+} from "./channel-member.validation.js";
 
 // mergeParams: true allows reading :channelId from parent channel routes
 export const memberRoutes = Router({ mergeParams: true });
@@ -27,3 +32,4 @@ memberRoutes.patch(
   validate("body", updateRoleBodySchema),
   updateRoleOfMember,
 );
+memberRoutes.delete("/:targetId", validate("params", removeMemberParamsSchema), removeMember);
