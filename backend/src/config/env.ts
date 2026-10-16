@@ -26,9 +26,8 @@ const envSchema = z.object({
 
   COOKIE_EXPIRES_DAYS: z.coerce.number().min(1).default(7),
 
-  EMAIL_USER: z.email({ message: "EMAIL_USER must be a valid email address" }),
-  EMAIL_PASS: z.string().min(1, { message: "EMAIL_PASS cannot be empty" }),
   EMAIL_FROM: z.string({ message: "EMAIL_FROM must be a valid email address" }),
+  RESEND_API_KEY: z.string().min(1, { message: "RESEND_API_KEY cannot be empty" }),
 
   FRONTEND_URL: z.url({ message: "FRONTEND_URL must be a valid URL string" }),
   ALLOWED_ORIGINS: z.string({

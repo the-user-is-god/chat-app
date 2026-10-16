@@ -3,17 +3,21 @@ import { BcryptHasher } from "@infrastructure/security/bcrypt-hasher.service.js"
 import { AuthRepository } from "./repositories/auth.repository.js";
 import { AuthService } from "./auth.service.js";
 import { CryptoJwtTokenService } from "@infrastructure/security/crypto-jwt.service.js";
-import { ResilientNodemailerProvider } from "@infrastructure/email/node-mailer.provider.js";
 import { SessionRepository } from "./repositories/session.repository.js";
 import { NodeEventEmitter } from "@infrastructure/events/node-event-emitter.js";
 import { AuthEmailListener } from "@infrastructure/events/listeners/auth-event.listener.js";
+import { ResilientEmailProvider } from "@infrastructure/email/resilient-email.provider.js";
+import { ResendEmailProvider } from "@infrastructure/email/resend-email.provider.js";
 
 export function createAuthModule() {
   const authRepository = new AuthRepository();
   const sessionRepository = new SessionRepository();
   const passwordHasher = new BcryptHasher(10);
   const tokenService = new CryptoJwtTokenService();
-  const emailProvider = new ResilientNodemailerProvider();
+  const emailProvider = new ResilientEmailProvider(new ResendEmailProvider(), {
+    retries: 3,
+    delay: 1000,
+  });
   const eventEmitter = new NodeEventEmitter();
 
   // Initialize and attach the background listeners
