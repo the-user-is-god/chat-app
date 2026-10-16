@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createChannelSchema = z.object({
   name: z.string().min(5).max(100),
-  description: z.string().min(1000).optional(),
+  description: z.string().max(1000).optional(),
   avatar: z.url().nullable().optional(),
   visibility: z.enum(["PUBLIC", "PRIVATE"]).default("PRIVATE"),
 });
